@@ -83,6 +83,11 @@
     return checkAndCompleteUrl(oppfUrl);
   }
 
+  function applyTrustPreview(preview: ServerTrustPreview): void {
+    trustPreview = preview;
+    submitError = undefined;
+  }
+
   async function handleClickConfirm(): Promise<void> {
     if (trustPreview !== undefined) {
       await handleConfirmTrust();
@@ -107,8 +112,7 @@
             password,
             STATIC_CONFIG.USER_AGENT,
           );
-          trustPreview = fetchedPreview;
-          submitError = undefined;
+          applyTrustPreview(fetchedPreview);
         } catch (previewError) {
           log.warn(
             'Unable to build TOFU trust preview, proceeding with direct verification:',

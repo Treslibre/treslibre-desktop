@@ -79,7 +79,7 @@
       // Message footer
       message-indicator-label: rgb(170, 170, 170),
       // Message status
-      message-status-acknowledged: map.get(map.get(theme.$brandings, consumer), primary-color-600),
+      message-status-acknowledged: #4ade80,
       message-status-declined: theme.$warning-orange,
       message-status-error: theme.$alert-red,
 

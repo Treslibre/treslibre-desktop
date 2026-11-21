@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="1024px" height="1024px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="1024" height="1024" rx="160" fill="#1D4ED8"/>
+  <rect x="0" y="0" width="1024" height="1024" rx="160" fill="#4B468A"/>
   <path d="M512,155L772,254V465C772,626 630,711 512,738C394,711 252,626 252,465V254Z" fill="#FFFFFF"/>
-  <path d="M368.00,330.00h130.00v26.00h-130.00zM420.00,356.00h26.00v156.00h-26.00zM534.40,330.00h26.00v182.00h-26.00zM560.40,486.00h104.00v26.00h-104.00z" fill="#1D4ED8"/>
-  <rect x="342" y="796" width="96" height="68" rx="14" fill="#BFDBFE"/>
-  <rect x="464" y="796" width="96" height="68" rx="14" fill="#BFDBFE"/>
-  <rect x="586" y="796" width="96" height="68" rx="14" fill="#BFDBFE"/>
+  <path d="M368.00,330.00h130.00v26.00h-130.00zM420.00,356.00h26.00v156.00h-26.00zM534.40,330.00h26.00v182.00h-26.00zM560.40,486.00h104.00v26.00h-104.00z" fill="#4B468A"/>
+  <rect x="342" y="796" width="96" height="68" rx="14" fill="#D0CFEC"/>
+  <rect x="464" y="796" width="96" height="68" rx="14" fill="#D0CFEC"/>
+  <rect x="586" y="796" width="96" height="68" rx="14" fill="#D0CFEC"/>
 </svg>

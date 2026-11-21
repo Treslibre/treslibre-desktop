@@ -1,15 +1,16 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 @use 'sass:color';
 @use 'sass:map';
 
 $onprem: (
-  primary-color-50: #ffe9e6,
-  primary-color-100: #ffd7d2,
-  primary-color-200: #ffc5be,
-  primary-color-300: #ffb4ab,
-  primary-color-400: #ffa297,
-  primary-color-500: #ff9083,
-  primary-color-600: #e37469,
-  primary-color-700: #c85950,
-  primary-color-800: #750603,
-  primary-color-900: #460402,
+  primary-color-50: #f6f6fc,
+  primary-color-100: #eeedf9,
+  primary-color-200: #e4e3f6,
+  primary-color-300: #dfdef4,
+  primary-color-400: #dcdbf2,
+  primary-color-500: #d0cfec,
+  primary-color-600: #b5b3de,
+  primary-color-700: #8f8cc4,
+  primary-color-800: #4b468a,
+  primary-color-900: #312d61,
 );

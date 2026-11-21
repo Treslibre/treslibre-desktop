@@ -1,15 +1,16 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 @use 'sass:color';
 @use 'sass:map';
 
 $consumer: (
-  primary-color-50: #ecfdf4,
-  primary-color-100: #d9fae9,
-  primary-color-200: #9cf2c6,
-  primary-color-300: #7deeb5,
-  primary-color-400: #5feaa3,
-  primary-color-500: #40e692,
-  primary-color-600: #36d588,
-  primary-color-700: #2cc47e,
-  primary-color-800: #0b734e,
-  primary-color-900: #00412a,
+  primary-color-50: #f6f6fc,
+  primary-color-100: #eeedf9,
+  primary-color-200: #e4e3f6,
+  primary-color-300: #dfdef4,
+  primary-color-400: #dcdbf2,
+  primary-color-500: #d0cfec,
+  primary-color-600: #b5b3de,
+  primary-color-700: #8f8cc4,
+  primary-color-800: #4b468a,
+  primary-color-900: #312d61,
 );

@@ -1,13 +1,14 @@
-/* Threema Consumer theme */
+/* Modified 2026 by Treslibre Project (Treslibre). */
+/* Treslibre Lavender Consumer theme */
 [data-branding='consumer'] {
-  --color-primary-50: #ecfdf4;
-  --color-primary-100: #d9fae9;
-  --color-primary-200: #9cf2c6;
-  --color-primary-300: #7deeb5;
-  --color-primary-400: #5feaa3;
-  --color-primary-500: #40e692;
-  --color-primary-600: #36d588;
-  --color-primary-700: #2cc47e;
-  --color-primary-800: #0b734e;
-  --color-primary-900: #00412a;
+  --color-primary-50: #f6f6fc;
+  --color-primary-100: #eeedf9;
+  --color-primary-200: #e4e3f6;
+  --color-primary-300: #dfdef4;
+  --color-primary-400: #dcdbf2;
+  --color-primary-500: #d0cfec;
+  --color-primary-600: #b5b3de;
+  --color-primary-700: #8f8cc4;
+  --color-primary-800: #4b468a;
+  --color-primary-900: #312d61;
 }

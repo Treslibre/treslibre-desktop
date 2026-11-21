@@ -1,13 +1,14 @@
-/* Threema Work theme */
+/* Modified 2026 by Treslibre Project (Treslibre). */
+/* Treslibre Lavender Work theme */
 [data-branding='work'] {
-  --color-primary-50: #dcf5ff;
-  --color-primary-100: #c0edff;
-  --color-primary-200: #a4e6ff;
-  --color-primary-300: #89deff;
-  --color-primary-400: #6dd7ff;
-  --color-primary-500: #51cfff;
-  --color-primary-600: #41afe0;
-  --color-primary-700: #318fc1;
-  --color-primary-800: #002e63;
-  --color-primary-900: #001c3b;
+  --color-primary-50: #f6f6fc;
+  --color-primary-100: #eeedf9;
+  --color-primary-200: #e4e3f6;
+  --color-primary-300: #dfdef4;
+  --color-primary-400: #dcdbf2;
+  --color-primary-500: #d0cfec;
+  --color-primary-600: #b5b3de;
+  --color-primary-700: #8f8cc4;
+  --color-primary-800: #4b468a;
+  --color-primary-900: #312d61;
 }

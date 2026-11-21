@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import type {f64} from '@threema/ts-utils/float/f64';
 
 /**
@@ -14,7 +15,7 @@ export interface LogoProps {
      */
     readonly oncompletion?: () => void;
     /**
-     * Optionally display a progress bar in place of the Threema dots with the given value between
+     * Optionally display a progress bar in place of the Treslibre security bars with the given value between
      * `0` and `1`. Alternatively, if the value is `"unknown"`, a pending animation will be shown.
      */
     readonly progress?: f64 | 'unknown';

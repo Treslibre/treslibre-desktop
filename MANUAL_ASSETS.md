@@ -6,6 +6,9 @@ placeholders with final production artwork before public distribution.
 
 ## Root & Web Branding
 
+- `apps/desktop/src/app/ui/components/partials/logo/Logo.svelte` — Inline welcome/pairing/loading
+  logo (replaced speech-bubble + 3-dot SVG with Lavender `#D0CFEC` / `#4B468A` / `#312D61`
+  palette-compatible geometric shield + keyhole + 3 security bars)
 - `logo_dark.svg` — Light-on-dark wordmark (`807.85 x 185.65` viewBox)
 - `logo_light.svg` — Dark-on-light wordmark (`807.85 x 185.65` viewBox)
 - `apps/desktop/src/public/res/splash.svg` — Splash screen monochrome wordmark (`991.1 x 181.75`

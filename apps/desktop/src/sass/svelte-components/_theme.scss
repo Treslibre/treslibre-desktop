@@ -201,7 +201,7 @@ $dark-availability-banner-unavailable: #5c2322;
         snackbar-toast-border-radius: em(8px),
         snackbar-toast-box-shadow: '0 1px 1px 0 rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12), 0 1px 3px 0 rgba(0,0,0,0.2)',
         snackbar-toast-icon-font-size: em(24px),
-        snackbar-toast-action-color: -g($consumer, primary-color-600),
+        snackbar-toast-action-color: -g($b, primary-color-500),
       ),
 
       threema: (
@@ -229,9 +229,9 @@ $dark-availability-banner-unavailable: #5c2322;
 
         // Verification dots
         verification-dots-empty-color: rgba(#000000, 12%),
-        verification-dots-server-verified-work-color: -g($work, primary-color-800),
-        verification-dots-fully-verified-consumer-color: -g($consumer, primary-color-800),
-        verification-dots-fully-verified-work-color: -g($work, primary-color-800)
+        verification-dots-server-verified-work-color: #0284c7,
+        verification-dots-fully-verified-consumer-color: #15803d,
+        verification-dots-fully-verified-work-color: #0284c7
       ),
     )),
   ),
@@ -362,7 +362,7 @@ $dark-availability-banner-unavailable: #5c2322;
         snackbar-toast-border-radius: em(8px),
         snackbar-toast-box-shadow: '0 1px 1px 0 rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12), 0 1px 3px 0 rgba(0,0,0,0.2)',
         snackbar-toast-icon-font-size: em(24px),
-        snackbar-toast-action-color: -g($consumer, primary-color-600),
+        snackbar-toast-action-color: -g($b, primary-color-800),
       ),
 
       threema: (
@@ -390,9 +390,9 @@ $dark-availability-banner-unavailable: #5c2322;
 
         // Verification dots
         verification-dots-empty-color: rgba(#ffffff, 12%),
-        verification-dots-server-verified-work-color: -g($work, primary-color-500),
-        verification-dots-fully-verified-consumer-color: -g($consumer, primary-color-500),
-        verification-dots-fully-verified-work-color: -g($work, primary-color-500)
+        verification-dots-server-verified-work-color: #38bdf8,
+        verification-dots-fully-verified-consumer-color: #4ade80,
+        verification-dots-fully-verified-work-color: #38bdf8
       ),
     )),
   ),
