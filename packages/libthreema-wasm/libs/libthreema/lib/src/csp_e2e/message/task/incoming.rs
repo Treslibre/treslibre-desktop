@@ -2549,7 +2549,7 @@ mod tests {
                 longitude: 8.78350732499435,
                 accuracy_m: Some(5_f64),
                 name: Some("Thermalbad".to_owned()),
-                address: Some("Churerstrasse 82\n8808 Zürich".to_owned()),
+                address: Some("Example Street 1\n8808 Zürich".to_owned()),
              }),
         )]
         outgoing_message_body: ContactMessageBody,

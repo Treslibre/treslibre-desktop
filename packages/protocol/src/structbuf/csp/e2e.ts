@@ -1479,7 +1479,7 @@ import * as utils from '../utils.js';
  * 1. _contact-defined_: Set by the contact, distributed through a
  *    [`set-profile-picture`](ref:e2e.set-profile-picture) message.
  * 2. _gateway-defined_: Set by the creator in the Threema Gateway (or Threema
- *    Broadcast) control panel and distributed through `avatar.threema.ch`.
+ *    Broadcast) control panel and distributed through `avatar.treslibre.invalid`.
  *    Only applicable to Threema Gateway IDs (starting with a `*`).
  * 3. _user-defined_: Set by the app user for this contact or imported from
  *    the address book. Applicable to all Threema IDs which are not Threema
@@ -1504,7 +1504,7 @@ import * as utils from '../utils.js';
  * For contacts with a Threema Gateway ID (starting with a `*`), the profile
  * picture needs to be fetched recurringly:
  *
- * 1. Fetch the profile picture for the ID from `avatar.threema.ch`.
+ * 1. Fetch the profile picture for the ID from `avatar.treslibre.invalid`.
  * 2. If no profile picture could be found, schedule the next refresh in 24h
  *    and abort these steps.
  * 3. Store the profile picture as the _gateway-defined_ picture.

@@ -30,7 +30,7 @@ There are two ways how MDM parameters can be defined and updated:
 [mdm-ios]:
   https://developer.apple.com/documentation/foundation/nsuserdefaults#2926901
 [appconfig]: https://www.appconfig.org/
-[mdm-threema]: https://threema.ch/en/work/app-configuration
+[mdm-threema]: https://treslibre.invalid/en/work/app-configuration
 
 If an external MDM and Threema App Configuration are enabled simultaneously,
 then both parameter sets are merged. If the same parameter is defined by both

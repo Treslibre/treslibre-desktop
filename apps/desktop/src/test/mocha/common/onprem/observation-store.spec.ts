@@ -1,12 +1,21 @@
 // Modified 2026 by Treslibre Project (Treslibre).
 import {generateKeyPairSync, sign as cryptoSign} from 'node:crypto';
 import * as fs from 'node:fs/promises';
+import * as https from 'node:https';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import {base64ToU8a} from '@threema/ts-utils/base64/base64-to-u8a';
 import {bytesToHex} from '@threema/ts-utils/byte/bytes-to-hex';
+import {UTF8} from '@threema/ts-utils/codec/utf8';
 import {expect} from 'chai';
 
+import {STATIC_CONFIG} from '~/common/config';
+import {
+    calculateOppfBodyOffset,
+    extractOppfBodyAndSignature,
+    OPPF_FILE_SCHEMA,
+} from '~/common/dom/backend/onprem/oppf';
 import {
     applyManualOverride,
     buildCanonicalRotationPayload,
@@ -16,6 +25,7 @@ import {
 } from '~/common/observation';
 import {
     EncryptedServerObservationStore,
+    probeHttpsEndpointCertificate,
     verifyEd25519WithNodeCrypto,
 } from '~/electron/observation-store';
 
@@ -219,6 +229,102 @@ export function run(): void {
 
                 const identicon = computeFingerprintIdenticon(initialChatKey);
                 expect(identicon.cells).to.have.lengthOf(25);
+            } finally {
+                await fs.rm(tempDir, {recursive: true, force: true});
+            }
+        });
+
+        it('verifies cleanroom unconfigured defaults and live TOFU provisioning against https://thr.2sx.me (§5.2)', async function () {
+            this.timeout(30000);
+            // 1. Verify zero upstream Threema fallback servers or keys in STATIC_CONFIG
+            expect(STATIC_CONFIG.ONPREM_CONFIG_TRUSTED_PUBLIC_KEYS).to.have.lengthOf(0);
+            expect(STATIC_CONFIG.UPDATE_SERVER_URL.href).to.include('.invalid');
+
+            // 2. Live fetch of https://thr.2sx.me/prov/config.oppf with Basic auth demo:demo-password
+            const rawOppf = await new Promise<Uint8Array>((resolve, reject) => {
+                const auth = Buffer.from('demo:demo-password', 'utf8').toString('base64');
+                const req = https.get(
+                    'https://thr.2sx.me/prov/config.oppf',
+                    {
+                        headers: {
+                            /* eslint-disable @typescript-eslint/naming-convention */
+                            Authorization: `Basic ${auth}`,
+                            /* eslint-enable @typescript-eslint/naming-convention */
+                        },
+                        timeout: 15000,
+                    },
+                    (res) => {
+                        if (res.statusCode !== 200) {
+                            reject(new Error(`Unexpected HTTP status ${res.statusCode}`));
+                            return;
+                        }
+                        const chunks: Buffer[] = [];
+                        res.on('data', (chunk: Buffer) => chunks.push(chunk));
+                        res.on('end', () => resolve(new Uint8Array(Buffer.concat(chunks))));
+                    },
+                );
+                req.on('timeout', () => {
+                    req.destroy(new Error('Request timed out'));
+                });
+                req.on('error', reject);
+            });
+
+            // 3. Verify unlocked OPPF v1.0 Ed25519 self-signature and extract endpoints
+            const offset = calculateOppfBodyOffset(rawOppf);
+            const {body, signature} = extractOppfBodyAndSignature(rawOppf, offset);
+            const sigBytes = base64ToU8a(UTF8.decode(signature));
+            const decoded = JSON.parse(UTF8.decode(body)) as Record<string, unknown>;
+            const parsedOppf = OPPF_FILE_SCHEMA.parse(decoded);
+
+            expect(verifyEd25519WithNodeCrypto(parsedOppf.signatureKey, body, sigBytes)).to.equal(
+                true,
+            );
+            const liveChatKeyHex = bytesToHex(parsedOppf.chat.publicKey).toLowerCase();
+            const liveAdminKeyHex = bytesToHex(parsedOppf.signatureKey).toLowerCase();
+            expect(liveChatKeyHex).to.have.lengthOf(64);
+            expect(liveAdminKeyHex).to.have.lengthOf(64);
+
+            // 4. Probe live TLS SPKI SHA-256 and leaf SHA-256 certificate fingerprints from https://thr.2sx.me
+            const liveDirCert = await probeHttpsEndpointCertificate('https://thr.2sx.me');
+            expect(liveDirCert.host).to.equal('thr.2sx.me');
+            expect(liveDirCert.spki_sha256.length).to.be.greaterThan(20);
+            expect(liveDirCert.leaf_sha256).to.match(/^[0-9a-f]{64}$/u);
+
+            // 5. Persist initial TOFU observation record to encrypted store and evaluate subsequent connections
+            const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'treslibre-live-2sx-'));
+            try {
+                const store = new EncryptedServerObservationStore(tempDir);
+                const pinned = await store.pinInitialServer({
+                    /* eslint-disable @typescript-eslint/naming-convention */
+                    server_id: 'chat.thr.2sx.me',
+                    chat_server_pubkey_curve25519: liveChatKeyHex,
+                    http_endpoints: {
+                        directory: liveDirCert,
+                        blob: liveDirCert,
+                        safe: liveDirCert,
+                    },
+                    admin_signing_pubkey_ed25519: liveAdminKeyHex,
+                    /* eslint-enable @typescript-eslint/naming-convention */
+                });
+                expect(pinned.server_id).to.equal('chat.thr.2sx.me');
+
+                // Subsequent connection with unchanged key succeeds silently
+                const matchEval = await store.evaluateChatServerKey({
+                    observedPubkeyHex: liveChatKeyHex,
+                });
+                expect(matchEval.allowed).to.equal(true);
+
+                // Simulated rogue MitM key swap triggers immediate hard-abort + blocking alert
+                const mitmKey = 'ff'.repeat(32);
+                const mitmEval = await store.evaluateChatServerKey({
+                    observedPubkeyHex: mitmKey,
+                });
+                expect(mitmEval.allowed).to.equal(false);
+                if (!mitmEval.allowed) {
+                    expect(mitmEval.alert.component).to.equal('chat_server');
+                    expect(mitmEval.alert.old_fingerprint).to.equal(liveChatKeyHex);
+                    expect(mitmEval.alert.new_fingerprint).to.equal(mitmKey);
+                }
             } finally {
                 await fs.rm(tempDir, {recursive: true, force: true});
             }

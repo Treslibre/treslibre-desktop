@@ -94,8 +94,18 @@ if (installedProtocVersion !== expectedProtocVersion) {
 process.chdir(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'));
 
 // Local protobuf modules.
+const pluginBin =
+    process.platform === 'win32'
+        ? '.\\node_modules\\.bin\\protoc-gen-ts_proto.cmd'
+        : './node_modules/.bin/protoc-gen-ts_proto';
+if (postinstall && !fs.existsSync(pluginBin)) {
+    console.warn(
+        `Warning: ${pluginBin} not present (e.g. --prod deploy); skipping postinstall protobuf generation.`,
+    );
+    process.exit(0);
+}
 run('protoc', [
-    '--plugin=./node_modules/.bin/protoc-gen-ts_proto',
+    `--plugin=${pluginBin}`,
     '--ts_proto_out=.',
     '--ts_proto_opt=forceLong=long',
     '--ts_proto_opt=esModuleInterop=true',

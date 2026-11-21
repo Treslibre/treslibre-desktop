@@ -586,6 +586,24 @@ async function packageApp(baseAppName, environment, mode, variant) {
     // Remove temporary deploy directory.
     fsExtra.removeSync(deployedAppDir);
 
+    // Restore workspace native modules for host NodeJS (since electron-rebuild overwrites shared
+    // pnpm store hardlinks with Electron's NODE_MODULE_VERSION).
+    console.info('Restoring native modules for host NodeJS in workspace');
+    spawnSync(
+        'pnpm',
+        ['-C', monorepoRootDir, '--filter', pkg.name, 'run', 'rebuild:dependencies'],
+        {
+            cwd: monorepoRootDir,
+            encoding: 'utf8',
+            env: {
+                ...process.env,
+                INIT_CWD: monorepoRootDir,
+            },
+            shell: true,
+            stdio: [null, 1, 2],
+        },
+    );
+
     // Set electron fuses.
     const binaryPath = join(outputPath, determineBinaryName(flavor, process.platform, baseAppName));
     await setElectronFuses(binaryPath, mode);

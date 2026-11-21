@@ -1019,7 +1019,7 @@ validate:rust-versions-in-sync:
       Name=$APPID
       Branch=$BRANCH
       Title=$TITLE
-      Homepage=https://threema.ch/
+      Homepage=https://treslibre.invalid/
       Url=$REPO_BASE_URL/$REPO/
       SuggestRemoteName=$REMOTE
       RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo

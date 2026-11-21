@@ -2,9 +2,9 @@
   # Servers
 
   work-servers: &work-servers
-    - url: https://ds-apip-work.threema.ch
+    - url: https://ds-apip-work.treslibre.invalid
       description: Production server
-    - url: https://ds-apip-work.test.threema.ch
+    - url: https://ds-apip-work.test.treslibre.invalid
       description: Sandbox server
 
   # Primitives
@@ -69,7 +69,7 @@
     description: Work license username.
     type: string
     minLength: 1
-    example: echoecho@threema.ch
+    example: echoecho@treslibre.invalid
 
   work-password: &work-password
     description: Work license password.
@@ -530,9 +530,9 @@
             must be discarded.
       example:
         success: true
-        sfuBaseUrl: https://sfu.threema.ch
+        sfuBaseUrl: https://sfu.treslibre.invalid
         allowedSfuHostnameSuffixes:
-          - threema.ch
+          - treslibre.invalid
         sfuToken: givemeaccessplz
         expiration: 600
 
@@ -906,9 +906,9 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://ds-apip.threema.ch
+  - url: https://ds-apip.treslibre.invalid
     description: Production server
-  - url: https://ds-apip.test.threema.ch
+  - url: https://ds-apip.test.treslibre.invalid
     description: Sandbox server
 
 paths:

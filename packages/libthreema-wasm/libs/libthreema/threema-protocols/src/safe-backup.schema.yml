@@ -1,5 +1,5 @@
 $schema: 'http://json-schema.org/draft-07/schema#'
-$id: 'https://safe.threema.ch/schema/1.json'
+$id: 'https://safe.treslibre.invalid/schema/1.json'
 description: Threema Safe backup format
 type: object
 properties:

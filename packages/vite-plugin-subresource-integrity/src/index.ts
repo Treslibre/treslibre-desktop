@@ -584,7 +584,7 @@ function readDirToBundle(dirPath: string): Bundle {
             }
 
             const filePath = path.resolve(dirent.parentPath, dirent.name);
-            const filename = path.relative(dirPath, filePath);
+            const filename = path.relative(dirPath, filePath).replaceAll('\\', '/');
             const content = fs.readFileSync(filePath);
 
             return [
