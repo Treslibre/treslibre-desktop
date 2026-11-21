@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {spawnSync} from 'node:child_process';
 import * as path from 'node:path';
 import * as process from 'node:process';
@@ -141,7 +142,7 @@ async function runSqlite(argv: string[]): Promise<void> {
     logger.info(`Loaded key storage for identity ${contents.inner.identityData.identity}`);
 
     // Run sqlcipher
-    const databasePath = path.join(profileDirectoryPath, 'data', 'threema.sqlite');
+    const databasePath = path.join(profileDirectoryPath, 'data', 'treslibre.sqlite');
     const spawnResult = spawnSync(
         'sqlcipher',
         [

@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 /**
  * Prepare distribution packages.
  */
@@ -200,7 +201,7 @@ function main(args: string[]): void {
         fail(`Invalid build flavor configuration: ${flavor}`);
     }
 
-    let appName: string | undefined = 'Threema';
+    let appName: string | undefined = 'Treslibre';
     if (flavor === 'custom-onprem') {
         const currentConfigOrError = readCustomConfig();
         if (currentConfigOrError instanceof Error) {
@@ -375,27 +376,27 @@ async function buildDmg(
     let iconFilename;
     switch (flavor) {
         case 'consumer-sandbox':
-            dmgName = 'ThreemaGreen';
+            dmgName = 'TreslibreGreen';
             installerBackgroundFilename = 'consumer.png';
             iconFilename = 'consumer-sandbox.icns';
             break;
         case 'consumer-live':
-            dmgName = 'Threema';
+            dmgName = 'Treslibre';
             installerBackgroundFilename = 'consumer.png';
             iconFilename = 'consumer-live.icns';
             break;
         case 'work-sandbox':
-            dmgName = 'ThreemaBlue';
+            dmgName = 'TreslibreBlue';
             installerBackgroundFilename = 'work.png';
             iconFilename = 'work-sandbox.icns';
             break;
         case 'work-live':
-            dmgName = 'ThreemaWork';
+            dmgName = 'TreslibreWork';
             installerBackgroundFilename = 'work.png';
             iconFilename = 'work-live.icns';
             break;
         case 'work-onprem':
-            dmgName = 'ThreemaOnPrem';
+            dmgName = 'Treslibre';
             installerBackgroundFilename = 'onprem.png';
             iconFilename = 'work-onprem.icns';
             break;
@@ -664,7 +665,7 @@ function buildMsix(dirs: Directories, appName: string, flavor: BuildFlavor, sign
     const msixOutPath = path.join(dirs.out, `${appId}-windows-${process.arch}.msix`);
     log.minor(`Writing MSIX file to ${msixOutPath}`);
     if (sign) {
-        for (const exe of ['ThreemaDesktop.exe', 'ThreemaDesktopLauncher.exe']) {
+        for (const exe of ['TreslibreDesktop.exe', 'TreslibreDesktopLauncher.exe']) {
             signWindowsBinaryOrPackage(path.join(binaryDirPath, exe), appName, flavor);
         }
     }
@@ -716,10 +717,10 @@ const FLATHUB_REPO_URL = 'https://flathub.org/repo/flathub.flatpakrepo';
  * Note: By default, this will build into a local repository without any GPG
  * verification. To customize this process, the following env vars can be used:
  *
- * - `THREEMADESKTOP_FLATPAK_REPO_PATH`: Path to flatpak repository, relative
+ * - `TRESLIBREDESKTOP_FLATPAK_REPO_PATH`: Path to flatpak repository, relative
  *   to `packaging/flatpak` or absolute.
- * - `THREEMADESKTOP_FLATPAK_GPG_KEY`: ID of the GPG Key used for Flatpak signing.
- * - `THREEMADESKTOP_FLATPAK_BRANCH`: The branch to use for flatpak. Defaults
+ * - `TRESLIBREDESKTOP_FLATPAK_GPG_KEY`: ID of the GPG Key used for Flatpak signing.
+ * - `TRESLIBREDESKTOP_FLATPAK_BRANCH`: The branch to use for flatpak. Defaults
  *   to "master" if not specified.
  */
 function buildFlatpaks(dirs: Directories, appName: string, flavor: BuildFlavor): void {
@@ -816,20 +817,20 @@ function buildFlatpaks(dirs: Directories, appName: string, flavor: BuildFlavor):
     // Build
     log.minor('Build Flatpak into local repo');
     const buildArgs = ['--force-clean', '--ccache'];
-    let repoPath = (process.env.THREEMADESKTOP_FLATPAK_REPO_PATH ?? '').trim();
+    let repoPath = (process.env.TRESLIBREDESKTOP_FLATPAK_REPO_PATH ?? '').trim();
     if (repoPath === '') {
         // Fallback to default path
         repoPath = path.join(flatpakDir, 'repo');
     }
     buildArgs.push(`--repo=${repoPath}`);
     buildArgs.push(`--state-dir=${path.join(flatpakDir, '.flatpak-builder')}`);
-    let branch = (process.env.THREEMADESKTOP_FLATPAK_BRANCH ?? '').trim();
+    let branch = (process.env.TRESLIBREDESKTOP_FLATPAK_BRANCH ?? '').trim();
     if (branch === '') {
         // Fallback to master (the Flatpak default)
         branch = 'master';
     }
     buildArgs.push(`--default-branch=${branch}`);
-    const gpgKey = (process.env.THREEMADESKTOP_FLATPAK_GPG_KEY ?? '').trim();
+    const gpgKey = (process.env.TRESLIBREDESKTOP_FLATPAK_GPG_KEY ?? '').trim();
     if (gpgKey !== '') {
         buildArgs.push(`--gpg-sign=${gpgKey}`);
     }
@@ -853,18 +854,18 @@ function buildFlatpaks(dirs: Directories, appName: string, flavor: BuildFlavor):
     log.minor('To add the local repository as a source:');
     if (gpgKey === '') {
         log.minor(
-            `    flatpak remote-add ${installationSourceArg} threema-desktop-local --no-gpg-verify ${repoPath}`,
+            `    flatpak remote-add ${installationSourceArg} treslibre-desktop-local --no-gpg-verify ${repoPath}`,
         );
     } else {
         const keypath = 'flatpak.pub';
         log.minor(`    gpg --export --armor ${gpgKey} > ${keypath}`);
         log.minor(
-            `    flatpak remote-add ${installationSourceArg} threema-desktop-local --gpg-import=${keypath} ${repoPath}`,
+            `    flatpak remote-add ${installationSourceArg} treslibre-desktop-local --gpg-import=${keypath} ${repoPath}`,
         );
     }
     log.minor(`To install the application from the local repository:`);
     log.minor(`    flatpak install ${installationSourceArg} --reinstall ${appId}`);
-    log.minor(`To launch Threema from the command line:`);
+    log.minor(`To launch Treslibre from the command line:`);
     log.minor(`    flatpak run ${appId}`);
 }
 

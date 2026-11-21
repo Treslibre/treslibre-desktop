@@ -1,8 +1,9 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 //! Update logic specific to Windows.
 //!
 //! Note: The `temp` directory (which contains the pre-downloaded update file) can be in two
 //! locations on Windows. This happens because application data is saved to `%APPDATA%` for
-//! compatibility reasons if a `ThreemaDesktop` directory has already existed there previously
+//! compatibility reasons if a `TreslibreDesktop` directory has already existed there previously
 //! (e.g., when updating from an older App Version), but otherwise it is saved to an
 //! application-specific subdirectory in `%LOCALAPPDATA%` (since we moved to MSIX). However, in both
 //! cases, the path from the application's viewpoint is `%APPDATA%`, and in the latter case, it is

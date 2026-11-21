@@ -1,10 +1,11 @@
+# Modified 2026 by Treslibre Project (Treslibre).
 [package]
-name = "threema-desktop-launcher"
+name = "treslibre-desktop-launcher"
 version = "1.0.0"
-authors = ["Danilo Bargen <danilo.bargen@threema.ch>"]
+authors = ["Treslibre Project", "Danilo Bargen"]
 edition = "2021"
-homepage = "https://threema.ch/"
-keywords = ["threema", "desktop", "launcher"]
+homepage = "https://github.com/Treslibre/treslibre-desktop"
+keywords = ["treslibre", "desktop", "launcher"]
 publish = false
 
 [dependencies]
@@ -39,7 +40,7 @@ objc2-security = "0.3.0"
 objc2-service-management = "0.3.0"
 
 [[bin]]
-name = "ThreemaDesktopLauncher"
+name = "TreslibreDesktopLauncher"
 path = "src/main.rs"
 
 [profile.release]

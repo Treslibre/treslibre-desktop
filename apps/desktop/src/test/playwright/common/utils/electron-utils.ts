@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -88,7 +89,7 @@ function deleteProfileDirectory(flavor: BuildFlavor, profile: string): void {
  * It must be built before calling this function.
  */
 function getElectronAppInfo(flavor: BuildFlavor): ElectronAppInfo {
-    const appName = determineAppName(flavor, 'Threema');
+    const appName = determineAppName(flavor, 'Treslibre');
 
     const buildDir = path.join(
         '..',
@@ -106,9 +107,9 @@ function getElectronAppInfo(flavor: BuildFlavor): ElectronAppInfo {
     if (process.platform === 'darwin') {
         const bundleDir = path.join(buildDir, `${appName}.app`);
         resourcesDir = path.join(bundleDir, 'Contents', 'Resources');
-        executablePath = path.join(bundleDir, 'Contents', 'MacOS', 'ThreemaDesktop');
+        executablePath = path.join(bundleDir, 'Contents', 'MacOS', 'TreslibreDesktop');
     } else {
-        const binary = process.platform === 'win32' ? 'ThreemaDesktop.exe' : 'ThreemaDesktop';
+        const binary = process.platform === 'win32' ? 'TreslibreDesktop.exe' : 'TreslibreDesktop';
         resourcesDir = path.join(buildDir, 'resources');
         executablePath = path.join(buildDir, binary);
     }
@@ -177,10 +178,10 @@ export async function launchElectronApp(
     return await electron.launch({
         args: [
             electronAppInfo.electronMain,
-            `--threema-profile=${profile}`,
+            `--treslibre-profile=${profile}`,
             process.env.GITLAB_CI === 'true' && flavor === 'consumer-sandbox'
                 ? ''
-                : `--threema-test-data=${testDataFile}`,
+                : `--treslibre-test-data=${testDataFile}`,
         ],
         executablePath: electronAppInfo.executablePath,
         colorScheme,

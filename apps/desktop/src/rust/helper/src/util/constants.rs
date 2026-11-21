@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 use common::util::constants::determine_app_rdn;
 use const_format::formatcp;
 
@@ -13,10 +14,10 @@ pub const APPLE_TEAM_ID: &str = match option_env!("APPLE_TEAM_ID") {
 ///
 /// Note:
 /// - Identifier of the connecting application needs to have the correct RDN (e.g.
-///   `ch.threema.threema-desktop`).
+///   `org.treslibre.app.desktop`).
 /// - The connecting application must be signed with a certificate issued by Apple, and:
 ///     - Must be of type "Developer ID Application" (`leaf[field.1.2.840.113635.100.6.1.13]`).
-///     - The Organization Unit (OU) must be Threema's Team ID.
+///     - The Organization Unit (OU) must be the signing Team ID.
 pub const SM_AUTHORIZED_CLIENTS: &str = formatcp!(
     r#"identifier "{}" and anchor apple generic and certificate leaf[subject.OU] = {} and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */"#,
     determine_app_rdn(),
@@ -37,7 +38,7 @@ pub const INFO_PLIST: &[u8] = formatcp!(
                 <key>CFBundleInfoDictionaryVersion</key>
                 <string>6.0</string>
                 <key>CFBundleName</key>
-                <string>Threema Update Helper</string>
+                <string>Treslibre Update Helper</string>
                 <key>CFBundleVersion</key>
                 <string>1.0.0</string>
                 <key>SMAuthorizedClients</key>

@@ -133,7 +133,7 @@ const RUN_PARAMETERS_DOCS: {readonly [K in keyof RunParameters]: string} = {
     'remote-secret-error':
         '<error-type> – Display a specific remote secret error type at login. Internal option, not useful to change manually.',
     'single-instance-lock':
-        '<true|false> – Prevent running multiple instances of Threema Desktop at the same time (default: "true"). Development option, disable at your own risk!',
+        '<true|false> – Prevent running multiple instances of Treslibre Desktop at the same time (default: "true"). Development option, disable at your own risk!',
     'test-data': '<path> – Path to test data including a profile. Used for e2e testing.',
 };
 
@@ -182,7 +182,7 @@ function showUsageAndExit(entrypoint: string, error?: unknown): never {
         `${APP_NAME_AND_VERSION}\n\n`,
         `Usage: ${entrypoint}\n`,
         ...Object.entries(RUN_PARAMETERS_DOCS).map(
-            ([option, description]) => `--threema-${option}=${description}\n`,
+            ([option, description]) => `--treslibre-${option}=${description}\n`,
         ),
         `\nNote: Electron parameters are supported as well:`,
         `\nhttps://www.electronjs.org/docs/latest/api/command-line-switches/`,
@@ -234,7 +234,7 @@ function handleCriticalError(
     electron.dialog
         .showMessageBox({
             title,
-            message: `A critical error occurred in ${source}. Please make sure logging is enabled (Settings > About Threema > Logging), and report this error to Threema Support (Settings > About Threema > Send Logs to Support).\n\n${fullErrorSummary}`,
+            message: `A critical error occurred in ${source}. Please make sure logging is enabled (Settings > About Treslibre > Logging).\n\n${fullErrorSummary}`,
             type: 'error',
             buttons,
             defaultId: 0,
@@ -447,13 +447,13 @@ async function init(): Promise<MainInit> {
                     process.exit(0);
                 }
 
-                // Let Electron handle any non-Threema-specific parameters
-                if (!raw.startsWith('--threema-')) {
+                // Let Electron handle any non-Treslibre-specific parameters
+                if (!raw.startsWith('--treslibre-')) {
                     return [undefined, undefined];
                 }
 
-                // Strip the `--threema-` prefix and split into option name and value
-                const [option, value] = raw.substring(10).split('=', 2);
+                // Strip the `--treslibre-` prefix and split into option name and value
+                const [option, value] = raw.substring('--treslibre-'.length).split('=', 2);
                 return [option, value];
             })
             .filter(([key]) => key !== undefined);
@@ -519,7 +519,7 @@ async function init(): Promise<MainInit> {
     log = logging.logger('main');
 
     // Initial log entries
-    const appName = ABOUT_PANEL_OPTIONS.applicationName ?? 'Threema';
+    const appName = ABOUT_PANEL_OPTIONS.applicationName ?? 'Treslibre';
     log.info(`
 Starting ${appName} ${ABOUT_PANEL_OPTIONS.applicationVersion}
 Version information:
@@ -531,7 +531,7 @@ Version information:
     // Determine URL
     let appBaseUrl: URL;
     if (!import.meta.env.DEBUG) {
-        appBaseUrl = new URL('threemadesktop://app/');
+        appBaseUrl = new URL('treslibredesktop://app/');
     } else {
         appBaseUrl = new URL(`http://localhost:${import.meta.env.DEV_SERVER_PORT}/`);
     }
@@ -688,9 +688,9 @@ function main(
             return new Response(message, {status: 400});
         }
 
-        // Handle requests to custom threemadesktop:// protocol
+        // Handle requests to custom treslibredesktop:// protocol
         electron.protocol.handle(
-            'threemadesktop',
+            'treslibredesktop',
             async (req: GlobalRequest): Promise<GlobalResponse> => {
                 const {host, pathname} = new URL(req.url);
 
@@ -707,7 +707,7 @@ function main(
                     return errorResponse(req.url, 'Pathname does not start with a slash');
                 }
 
-                // On requests to `threemadesktop://app/`, load application entrypoint
+                // On requests to `treslibredesktop://app/`, load application entrypoint
                 if (pathname === '/') {
                     try {
                         return await electron.net.fetch(
@@ -1178,7 +1178,7 @@ function main(
             if (
                 !blockRequests ||
                 url.protocol === 'devtools:' ||
-                url.protocol === 'threemadesktop:' ||
+                url.protocol === 'treslibredesktop:' ||
                 url.hostname === 'localhost' ||
                 url.hostname === '127.0.0.1' ||
                 url.hostname === '::1'
@@ -1202,7 +1202,7 @@ function main(
         session.webRequest.onBeforeSendHeaders((details, callback) => {
             const url = new URL(details.url);
 
-            // Only override for network requests; internal schemes (threemadesktop:, devtools:, …)
+            // Only override for network requests; internal schemes (treslibredesktop:, devtools:, …)
             // don't need a user agent.
             if (!['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol)) {
                 return callback({requestHeaders: details.requestHeaders});
@@ -1699,7 +1699,7 @@ function main(
             : {
                   // eslint-disable-next-line @typescript-eslint/naming-convention
                   submitURL: import.meta.env.MINIDUMP_ENDPOINT,
-                  companyName: 'Threema',
+                  companyName: 'Treslibre',
                   productName: import.meta.env.APP_NAME,
                   ignoreSystemCrashHandler: true,
               },
@@ -1781,12 +1781,12 @@ setAssertFailLogger((error) => CONSOLE_LOGGER.error(extractErrorTraceback(error)
 (async () => {
     const signal = {start: false};
 
-    // Register custom threemadesktop:// protocol
+    // Register custom treslibredesktop:// protocol
     //
     // See https://www.electronjs.org/docs/latest/tutorial/security#18-avoid-usage-of-the-file-protocol-and-prefer-usage-of-custom-protocols
     electron.protocol.registerSchemesAsPrivileged([
         {
-            scheme: 'threemadesktop',
+            scheme: 'treslibredesktop',
             /* eslint-disable @typescript-eslint/naming-convention */
             privileges: {
                 // Treat scheme as "standard-format" URL scheme. See https://chromium.googlesource.com/chromium/src/+/HEAD/url/url_util.h

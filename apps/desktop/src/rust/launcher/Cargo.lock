@@ -574,27 +574,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "threema-desktop-launcher"
-version = "1.0.0"
-dependencies = [
- "colored",
- "common",
- "const_format",
- "futures",
- "home",
- "num_enum",
- "objc2",
- "objc2-core-foundation",
- "objc2-foundation",
- "objc2-security",
- "objc2-service-management",
- "sha2",
- "time",
- "tokio",
- "windows",
-]
-
-[[package]]
 name = "time"
 version = "0.3.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -655,6 +634,27 @@ dependencies = [
  "indexmap",
  "toml_datetime",
  "winnow",
+]
+
+[[package]]
+name = "treslibre-desktop-launcher"
+version = "1.0.0"
+dependencies = [
+ "colored",
+ "common",
+ "const_format",
+ "futures",
+ "home",
+ "num_enum",
+ "objc2",
+ "objc2-core-foundation",
+ "objc2-foundation",
+ "objc2-security",
+ "objc2-service-management",
+ "sha2",
+ "time",
+ "tokio",
+ "windows",
 ]
 
 [[package]]

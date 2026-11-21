@@ -1,4 +1,5 @@
 #!/bin/bash
+# Modified 2026 by Treslibre Project (Treslibre).
 #
 # Open the SQLite database in the user profile.
 set -euo pipefail
@@ -26,7 +27,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Determine database path
-dbpath="$profiledir/data/threema.sqlite"
+dbpath="$profiledir/data/treslibre.sqlite"
 if [[ -f "$dbpath" ]]; then
     echo -e "Opening database at $dbpath\n"
 else

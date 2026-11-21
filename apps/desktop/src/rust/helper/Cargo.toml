@@ -1,10 +1,11 @@
+# Modified 2026 by Treslibre Project (Treslibre).
 [package]
-name = "threema-desktop-helper"
+name = "treslibre-desktop-helper"
 version = "1.0.0"
-authors = ["Gian-Reto Tarnutzer <gian.reto.tarnutzer@threema.ch>"]
+authors = ["Treslibre Project", "Gian-Reto Tarnutzer"]
 edition = "2021"
-homepage = "https://threema.ch/"
-keywords = ["threema", "desktop", "helper"]
+homepage = "https://github.com/Treslibre/treslibre-desktop"
+keywords = ["treslibre", "desktop", "helper"]
 publish = false
 
 [dependencies]
@@ -25,7 +26,7 @@ objc2-security = "0.3.0"
 embed_plist = "1.2.2"
 
 [[bin]]
-name = "ThreemaDesktopHelper"
+name = "TreslibreDesktopHelper"
 path = "src/main.rs"
 
 [profile.release]

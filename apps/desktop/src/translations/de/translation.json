@@ -304,15 +304,15 @@
   },
   "dialog--key-storage-migration-failed": {
     "label--title": "Backend-Migration fehlgeschlagen",
-    "prose--description-consumer": "Eine Migration im Backend ist unerwartet fehlgeschlagen. Um Threema für Desktop weiterhin zu nutzen, wenden Sie sich an unseren <slot_1>Support</slot_1> und senden Sie nach Möglichkeit eine Logdatei.",
-    "prose--description-work": "Eine Migration im Backend ist unerwartet fehlgeschlagen. Um Threema für Desktop weiterhin zu nutzen, wenden Sie sich an Ihren Administrator."
+    "prose--description-consumer": "Eine Migration im Backend ist unerwartet fehlgeschlagen. Um {shortAppName} für Desktop weiterhin zu nutzen, wenden Sie sich an unseren <slot_1>Support</slot_1> und senden Sie nach Möglichkeit eine Logdatei.",
+    "prose--description-work": "Eine Migration im Backend ist unerwartet fehlgeschlagen. Um {shortAppName} für Desktop weiterhin zu nutzen, wenden Sie sich an Ihren Administrator."
   },
   "dialog--linking-confirm-emoji": {
     "label--title": "Bestätigen Sie die Bilder auf Ihrem Mobilgerät."
   },
   "dialog--linking-error": {
     "hint--expand-full-error-message": "Vollständigen Fehler anzeigen",
-    "hint--invalid-certificate-pins": "Das TLS-Zertifikat und die im Cache gespeicherten PINs stimmen nicht überein. Bitte stellen Sie sicher, dass die Threema OnPrem-Konfiguration (OPPF) mit dem verwendeten TLS-Zertifikat übereinstimmt.",
+    "hint--invalid-certificate-pins": "Das TLS-Zertifikat und die im Cache gespeicherten PINs stimmen nicht überein. Bitte stellen Sie sicher, dass die {fullAppName}-Konfiguration (OPPF) mit dem verwendeten TLS-Zertifikat übereinstimmt.",
     "label--message-connection-error-timeout": "Aufgrund Inaktivität wurde der Verknüpfungsvorgang abgebrochen. Bitte starten Sie den Vorgang erneut.",
     "label--message-rendezvous-error-timeout": "Aufgrund Inaktivität wurde der Verknüpfungsvorgang abgebrochen. Bitte starten Sie den Vorgang erneut.",
     "label--message-restore-error": "Bei der Wiederherstellung der übertragenen Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
@@ -526,7 +526,7 @@
   },
   "dialog--verification-levels": {
     "label--title": "Vertrauensstufen",
-    "prose--intro": "Die Punkte geben die Vertrauensstufe eines Kontakts an. ",
+    "prose--intro": "Die Vertrauensbalken geben die Vertrauensstufe eines Kontakts an.",
     "prose--level-fully-verified-default": "Der öffentliche Schlüssel der Person wurde persönlich durch Scannen des QR-Codes verifiziert. Solange das Gerät dieser Person nicht gestohlen/gehackt wurde, ist es ausgeschlossen, dass ein Dritter Nachrichten von dieser Person fälschen oder Nachrichten an diese Person mitlesen kann.",
     "prose--level-fully-verified-work": "Diese Vertrauensstufe ist nur in {fullAppName} verfügbar und zeigt an, dass Sie den öffentlichen Schlüssel dieses internen Kontakts durch Scannen des QR-Codes verifiziert haben.",
     "prose--level-server-verified-default": "Der Kontakt wurde im Adressbuch gefunden (mit Handynummer oder E-Mail-Adresse). Da der Server Handynummern und E-Mail-Adressen prüft (SMS bzw. E-Mail mit Aktivierungslink), kann man sich ohne zusätzliches Verifizieren relativ sicher sein, dass diese Person wirklich diejenige ist, die man meint.",

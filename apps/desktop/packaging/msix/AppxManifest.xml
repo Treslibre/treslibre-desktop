@@ -3,6 +3,7 @@
   For more information about this file, see
   https://learn.microsoft.com/en-us/windows/msix/desktop/desktop-to-uwp-manual-conversion
 -->
+<!-- Modified 2026 by Treslibre Project (Treslibre). -->
 <Package
     xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
     xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -18,9 +19,9 @@
     />
     <Properties>
         <DisplayName>{{displayName}}</DisplayName>
-        <PublisherDisplayName>Threema AG</PublisherDisplayName>
+        <PublisherDisplayName>Treslibre Project</PublisherDisplayName>
         <Description
-        >Threema for desktop is a desktop client for Threema, a privacy-focused end-to-end encrypted mobile messenger hosted and developed in Switzerland.</Description>
+        >Treslibre for desktop is an independent desktop client compatible with cleanroom servers.</Description>
         <!-- Will be used as the icon inside the installer-->
         <Logo>resources\StoreLogo.png</Logo>
     </Properties>
@@ -44,7 +45,7 @@
         <!-- Launcher binary. This is the main and only entry point. -->
         <Application
             Id="{{applicationId}}.Launcher"
-            Executable="ThreemaDesktopLauncher.exe"
+            Executable="TreslibreDesktopLauncher.exe"
             uap10:RuntimeBehavior="packagedClassicApp"
             uap10:TrustLevel="mediumIL"
         >
@@ -57,10 +58,10 @@
                 BackgroundColor="transparent"
             />
             <Extensions>
-                <!-- The app execution alias allows launching Threema from the command line. -->
+                <!-- The app execution alias allows launching Treslibre from the command line. -->
                 <uap5:Extension
                     Category="windows.appExecutionAlias"
-                    Executable="ThreemaDesktopLauncher.exe"
+                    Executable="TreslibreDesktopLauncher.exe"
                     EntryPoint="Windows.FullTrustApplication"
                 >
                     <uap5:AppExecutionAlias uap10:Subsystem='windows'>

@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 use common::{
     ipc::message::{ipc_read_message, ipc_write_message, IPCCommandMessage, IPCResponseMessage},
     util::{
@@ -579,7 +580,7 @@ fn umount_image(path: &PathBuf) -> Result<(), Error> {
 
 /// Returns the install directory of the app bundle by navigating four directory levels up from the
 /// currently running binary (e.g.,
-/// `foo/Threema Beta.app/Contents/MacOS/ThreemaDesktopLauncher` -> `foo`).
+/// `foo/Treslibre.app/Contents/MacOS/TreslibreDesktopLauncher` -> `foo`).
 fn get_current_install_dir() -> Result<PathBuf, Error> {
     env::current_exe()?
         .ancestors()

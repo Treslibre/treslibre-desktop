@@ -1,4 +1,5 @@
 <!--
+  Modified 2026 by Treslibre Project (Treslibre).
   @component Renders a modal with details about verification levels.
 -->
 <script lang="ts">
@@ -28,7 +29,7 @@
     <div class="intro">
       {$i18n.t(
         'dialog--verification-levels.prose--intro',
-        'The dots are an indicator for a contact`s verification level.',
+        'The trust bars indicate a contact’s verification level.',
       )}
     </div>
 

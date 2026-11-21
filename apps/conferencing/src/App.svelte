@@ -45,8 +45,8 @@
 
   <footer class="text-neutral-500 mt-8 border-t pt-4 text-center text-xs">
     <p>
-      Modified 2026 by Treslibre Project (Treslibre), an independent fork of Threema (© Threema AG).
-      Not affiliated with or endorsed by Threema AG.
+      Modified 2026 by Treslibre Project (Treslibre), an independent fork of Threema (© Threema
+      AG). Not affiliated with or endorsed by Threema AG.
     </p>
     <p class="mt-1">
       Licensed under GNU AGPL-3.0-or-later. Corresponding Source Code:

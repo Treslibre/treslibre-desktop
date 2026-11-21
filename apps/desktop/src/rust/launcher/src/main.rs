@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 #![windows_subsystem = "windows"] // Prevent console window from showing up on Windows
 #![deny(clippy::print_stdout, clippy::print_stderr)] // Use print_log and print_error
 
@@ -35,8 +36,8 @@ fn print_usage_and_exit(launcher_path: &str) -> ! {
 /// Determine binary name based on operating system
 fn determine_binary_name() -> &'static str {
     match env::consts::OS {
-        "windows" => "ThreemaDesktop.exe",
-        _other => "ThreemaDesktop",
+        "windows" => "TreslibreDesktop.exe",
+        _other => "TreslibreDesktop",
     }
 }
 
@@ -58,15 +59,11 @@ async fn main() {
     );
 
     // Print header
-    let color = if BUILD_FLAVOR.starts_with("work-") {
-        "blue"
-    } else {
-        "green"
-    };
-    print_log!("{}", " _____ _                         ".color(color));
-    print_log!("{}", "|_   _| |_ ___ ___ ___ _____ ___ ".color(color));
-    print_log!("{}", "  | | |   |  _| -_| -_|     | .'|".color(color));
-    print_log!("{}", "  |_| |_|_|_| |___|___|_|_|_|__,|".color(color));
+    let color = "green";
+    print_log!("{}", " _____             _ _ _             ".color(color));
+    print_log!("{}", "|_   _| _ ___ ___ | (_) |__ _ _ ___  ".color(color));
+    print_log!("{}", "  | || '_/ -_|_-< | | | '_ \\ '_/ -_) ".color(color));
+    print_log!("{}", "  |_||_| \\___/__/ |_|_|_.__/_| \\___| ".color(color));
     print_log!();
     print_log!("Desktop launcher v{} ({})", VERSION, BUILD_FLAVOR);
 
@@ -109,7 +106,7 @@ async fn main() {
             process::exit(EXIT_CODE_LAUNCHER_ERROR);
         }
     };
-    print_log!("Launching Threema Desktop through {:?}", target_path);
+    print_log!("Launching Treslibre Desktop through {:?}", target_path);
 
     // Ensure that target path exists
     if !target_path.exists() {
@@ -161,14 +158,14 @@ async fn main() {
         // Add remote secret launch argument, if there was an error in the last iteration
         if let Some(err) = remote_secret_error {
             cmd.arg(format!(
-                "--threema-remote-secret-error={}",
+                "--treslibre-remote-secret-error={}",
                 err.as_cli_flag_value()
             ));
         }
 
         // Add remote secret launch argument, if there was an error in the last iteration
         if let Some(err) = remote_secret_restart_request {
-            cmd.arg(format!("--threema-remote-secret-suspend-restart={}", err));
+            cmd.arg(format!("--treslibre-remote-secret-suspend-restart={}", err));
         }
 
         // Spawn child process
@@ -285,7 +282,7 @@ async fn main() {
                 let err = ExitCodeRestartRemoteSecretError::try_from(code).unwrap();
                 print_log!("------");
                 print_log!(
-                    "Restarting with remote secret error flag (--threema-remote-secret-error={})",
+                    "Restarting with remote secret error flag (--treslibre-remote-secret-error={})",
                     err.as_cli_flag_value()
                 );
                 remote_secret_error = Some(err);

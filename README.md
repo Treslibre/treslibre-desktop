@@ -11,11 +11,13 @@
 
 ---
 
-> **Notice (AGPL-3.0 Section 5a):** Modified by Treslibre Project (2026) as part of Treslibre, an independent fork of Threema. Not affiliated with or endorsed by Threema AG.
+> **Notice (AGPL-3.0 Section 5a):** Modified by Treslibre Project (2026) as part of Treslibre, an
+> independent fork of Threema. Not affiliated with or endorsed by Threema AG.
 
 # Treslibre for Desktop
 
-A standalone Treslibre client for the desktop (Windows/macOS/Linux), forked from Threema for Desktop under GNU AGPL-3.0.
+A standalone Treslibre client for the desktop (Windows/macOS/Linux), forked from Threema for Desktop
+under GNU AGPL-3.0.
 
 ## Table of Contents
 
@@ -195,7 +197,8 @@ terminal, e.g. `pnpm run dev:desktop:consumer-live`.
 
 ## <a name="license"></a>License
 
-Treslibre for Desktop (forked from Threema for Desktop) is licensed under the GNU Affero General Public License v3.
+Treslibre for Desktop (forked from Threema for Desktop) is licensed under the GNU Affero General
+Public License v3.
 
     Modified 2026 by Treslibre Project (Treslibre), an independent fork of Threema.
     Original work: Copyright (c) Threema AG

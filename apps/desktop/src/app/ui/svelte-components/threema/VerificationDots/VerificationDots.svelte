@@ -1,3 +1,4 @@
+<!-- Modified 2026 by Treslibre Project (Treslibre). -->
 <script lang="ts">
   import type {
     VerificationLevel,
@@ -32,14 +33,16 @@
     grid-template:
       'dot dot dot'
       / 1fr 1fr 1fr;
-    gap: var(--c-verification-dots-gap, default);
+    gap: calc(var(--c-verification-dots-gap, default) * 0.5);
+    align-items: center;
   }
 
   .dot {
     font-size: var(--c-verification-dots-size, default);
     height: 1em;
-    width: 1em;
-    border-radius: 50%;
+    width: 0.55em;
+    border-radius: 0.15em;
+    clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
     background-color: var(--c-verification-dots-empty-color, default);
   }
 

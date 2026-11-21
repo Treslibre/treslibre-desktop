@@ -312,7 +312,7 @@
   },
   "dialog--linking-error": {
     "hint--expand-full-error-message": "Show full error",
-    "hint--invalid-certificate-pins": "There was a mismatch between the TLS certificate and the cached PINs. Please make sure the Threema OnPrem configuration (OPPF) matches the TLS certificate in use.",
+    "hint--invalid-certificate-pins": "There was a mismatch between the TLS certificate and the cached PINs. Please make sure the {fullAppName} configuration (OPPF) matches the TLS certificate in use.",
     "label--message-connection-error-timeout": "Due to inactivity, the linking process was terminated. Please start the process again.",
     "label--message-rendezvous-error-timeout": "Due to inactivity, the linking process was terminated. Please start the process again.",
     "label--message-restore-error": "There was an error restoring the transferred data. Please try again.",
@@ -526,7 +526,7 @@
   },
   "dialog--verification-levels": {
     "label--title": "Verification Levels",
-    "prose--intro": "The dots are an indicator for a contact’s verification level.",
+    "prose--intro": "The trust bars indicate a contact’s verification level.",
     "prose--level-fully-verified-default": "You have personally verified the ID and public key of the person by scanning their QR code. Assuming their device has not been hijacked, you can be very sure that messages from this contact were really written by the person that they indicate.",
     "prose--level-fully-verified-work": "This verification level is only available in {fullAppName}; it indicates that the {shortAppName} ID belongs to an internal contact whose ID and public key you have verified by scanning their QR code.",
     "prose--level-server-verified-default": "The ID has been matched with a contact in your address book (by phone number or email). Since the server verifies phone numbers and email addresses, you can be reasonably sure that the person is who they claim to be.",
@@ -803,7 +803,7 @@
     "label--version-title": "Version Information",
     "prose--call-statistics-entries": "{n, plural, =1 {1 entry} other {# entries}}",
     "prose--call-statistics-turned-off": "Call statistics recording is currently turned off",
-    "prose--call-statistics-turned-on": "WebRTC statistics of Threema calls are recorded into a local database. Nothing is sent automatically.",
+    "prose--call-statistics-turned-on": "WebRTC statistics of {shortAppName} calls are recorded into a local database. Nothing is sent automatically.",
     "prose--logging-turned-off": "Logging is currently turned off",
     "prose--logging-turned-on": "Logging is turned on",
     "prose--third-party-code": "<slot_1 /> contains code from open source libraries. Please check out the file <slot_2 /> for detailed license information."

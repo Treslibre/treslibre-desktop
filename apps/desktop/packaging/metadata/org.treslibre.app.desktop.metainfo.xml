@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<component type="desktop-application">
+    <metadata_license>CC-BY-SA-3.0</metadata_license>
+    <id>org.treslibre.app.desktop</id>
+    <name>Treslibre</name>
+    <project_license>AGPL-3.0</project_license>
+    <summary>Treslibre for desktop allows using Treslibre from your computer.</summary>
+    <url type="homepage">https://github.com/Treslibre/treslibre-desktop</url>
+    <description>
+        <p>
+            Treslibre for desktop is an independent desktop client compatible with cleanroom
+            servers.
+        </p>
+    </description>
+    <developer_name>Treslibre Project</developer_name>
+    <developer id="org.treslibre">
+        <name translate="no">Treslibre Project</name>
+    </developer>
+
+    <releases>
+        <release version="2.0.0" date="2026-11-21">
+            <description>
+                <p>Initial Treslibre fork release.</p>
+            </description>
+        </release>
+    </releases>
+    <launchable type="desktop-id">org.treslibre.app.desktop.desktop</launchable>
+    <content_rating type="oars-1.1">
+        <content_attribute id="social-chat">intense</content_attribute>
+        <content_attribute id="social-audio">intense</content_attribute>
+    </content_rating>
+</component>

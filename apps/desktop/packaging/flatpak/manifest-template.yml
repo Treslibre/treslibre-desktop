@@ -37,7 +37,7 @@ finish-args:
 build-options:
   append-path: /usr/lib/sdk/rust-stable/bin
   env:
-    CARGO_HOME: /run/build/threema-desktop/cargo
+    CARGO_HOME: /run/build/treslibre-desktop/cargo
 modules:
   # Because the flatpak runtime's libsecret is built with gcrypt (breaking Electron's keyring
   # detection in the sandbox), we build libsecret explicitly without gcrypt backend, so that it uses
@@ -69,7 +69,7 @@ modules:
         url: https://download.gnome.org/sources/libsecret/0.21/libsecret-0.21.7.tar.xz
         sha256: 6b452e4750590a2b5617adc40026f28d2f4903de15f1250e1d1c40bfd68ed55e
 
-  - name: threema-desktop
+  - name: treslibre-desktop
     buildsystem: simple
     sources:
       # Prebuilt Electron app.
@@ -88,9 +88,9 @@ modules:
         dest-filename: run.sh
       # Metadata files.
       - type: file
-        path: ../../packaging/metadata/ch.threema.threema-desktop.metainfo.xml
+        path: ../../packaging/metadata/org.treslibre.app.desktop.metainfo.xml
       - type: file
-        path: ../../packaging/metadata/ch.threema.threema-desktop.desktop
+        path: ../../packaging/metadata/org.treslibre.app.desktop.desktop
       # Icon assets.
       - type: dir
         path: ../../packaging/assets/icons/flatpak
@@ -104,17 +104,17 @@ modules:
       - mkdir -p /app/main
       - cp -a prebuilt/* /app/main/
       # Install launcher binary.
-      - install -Dm755 src/rust/launcher/target/release/ThreemaDesktopLauncher /app/main/ThreemaDesktopLauncher
+      - install -Dm755 src/rust/launcher/target/release/TreslibreDesktopLauncher /app/main/TreslibreDesktopLauncher
       # Install app wrapper.
       - install -Dm755 run.sh /app/bin/
       # Install metadata.
-      - install -Dm644 ch.threema.threema-desktop.metainfo.xml /app/share/metainfo/{{app-id}}.metainfo.xml
-      - install -Dm644 ch.threema.threema-desktop.desktop /app/share/applications/{{app-id}}.desktop
-      - sed -i 's/ch.threema.threema-desktop/{{app-id}}/g' /app/share/metainfo/{{app-id}}.metainfo.xml
-      - sed -i 's/ch.threema.threema-desktop/{{app-id}}/g' /app/share/applications/{{app-id}}.desktop
-      - sed -i "s#name>Threema<#name>{{app-name}}<#" /app/share/metainfo/{{app-id}}.metainfo.xml
-      - sed -i "s#Name=Threema#Name={{app-name}}#" /app/share/applications/{{app-id}}.desktop
-      - sed -i "s#StartupWMClass=Threema#StartupWMClass={{app-name}}#" /app/share/applications/{{app-id}}.desktop
+      - install -Dm644 org.treslibre.app.desktop.metainfo.xml /app/share/metainfo/{{app-id}}.metainfo.xml
+      - install -Dm644 org.treslibre.app.desktop.desktop /app/share/applications/{{app-id}}.desktop
+      - sed -i 's/org.treslibre.app.desktop/{{app-id}}/g' /app/share/metainfo/{{app-id}}.metainfo.xml
+      - sed -i 's/org.treslibre.app.desktop/{{app-id}}/g' /app/share/applications/{{app-id}}.desktop
+      - sed -i "s#name>Treslibre<#name>{{app-name}}<#" /app/share/metainfo/{{app-id}}.metainfo.xml
+      - sed -i "s#Name=Treslibre#Name={{app-name}}#" /app/share/applications/{{app-id}}.desktop
+      - sed -i "s#StartupWMClass=Treslibre#StartupWMClass={{app-name}}#" /app/share/applications/{{app-id}}.desktop
       # Install Icons.
       - mkdir -p /app/share/icons/hicolor/{512x512,scalable}/apps/
       - |

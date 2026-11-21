@@ -152,7 +152,7 @@ const LoggingDownloader = {
  * project.
  *
  * @param {string} baseAppName Name to use as the base for generating binary names, etc., e.g.
- *   "Threema".
+ *   "Treslibre".
  * @param {string[]} basePath The base path of the extra binary's Rust project.
  * @param {import("../config/base").BuildFlavor} flavor The app flavor.
  * @param {string} outputPath The output path to copy the extra binary to.
@@ -250,14 +250,14 @@ function buildAndBundleExtraBinary(
         const plist = fs
             .readFileSync(plistPath, 'utf8')
             .replace(
-                /<key>CFBundleExecutable<\/key>(?<whitespace>[\s]+)<string>ThreemaDesktop<\/string>/u,
+                /<key>CFBundleExecutable<\/key>(?<whitespace>[\s]+)<string>TreslibreDesktop<\/string>/u,
                 `<key>CFBundleExecutable</key>$<whitespace><string>${extraBinaryDestinationName}</string>`,
             )
             // Typically, the `CFBundleDisplayName` is derived from the `executableName` provided to
             // `@electron/packager`. However, the display name is different to the name of the
             // executable in our case, so we need to override it.
             .replace(
-                /<key>CFBundleDisplayName<\/key>(?<whitespace>[\s]+)<string>ThreemaDesktop<\/string>/u,
+                /<key>CFBundleDisplayName<\/key>(?<whitespace>[\s]+)<string>TreslibreDesktop<\/string>/u,
                 `<key>CFBundleDisplayName</key>$<whitespace><string>${appName}</string>`,
             );
         fs.writeFileSync(plistPath, plist, 'utf8');
@@ -268,7 +268,7 @@ function buildAndBundleExtraBinary(
  * Package the application for the given parameters.
  *
  * @param {string} baseAppName Name to use as the base for generating binary names, etc., e.g.
- *   "Threema".
+ *   "Treslibre".
  * @param {import("../config/base").BuildEnvironment} environment The environment to build for.
  * @param {import("../config/base").BuildMode} mode Build mode to use.
  * @param {import("../config/base").BuildVariant} variant The app variant to build.
@@ -416,20 +416,10 @@ async function packageApp(baseAppName, environment, mode, variant) {
             let smPrivilegedExecutables;
             switch (variant) {
                 case 'consumer':
-                    smPrivilegedExecutables = {
-                        'ch.threema.threema-desktop-helper': `identifier "ch.threema.threema-desktop-helper" and anchor apple generic and certificate leaf[subject.OU] = ${process.env.APPLE_TEAM_ID} and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */`,
-                    };
-                    break;
-
                 case 'work':
-                    smPrivilegedExecutables = {
-                        'ch.threema.threema-work-desktop-helper': `identifier "ch.threema.threema-work-desktop-helper" and anchor apple generic and certificate leaf[subject.OU] = ${process.env.APPLE_TEAM_ID} and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */`,
-                    };
-                    break;
-                // TODO(DESK-1809): Derive identifiers from custom config.
                 case 'custom':
                     smPrivilegedExecutables = {
-                        'ch.threema.threema-work-desktop-helper': `identifier "ch.threema.threema-work-desktop-helper" and anchor apple generic and certificate leaf[subject.OU] = ${process.env.APPLE_TEAM_ID} and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */`,
+                        'org.treslibre.app.desktop-helper': `identifier "org.treslibre.app.desktop-helper" and anchor apple generic and certificate leaf[subject.OU] = ${process.env.APPLE_TEAM_ID} and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */`,
                     };
                     break;
                 default:
@@ -489,7 +479,7 @@ async function packageApp(baseAppName, environment, mode, variant) {
             'Modified 2026 by Treslibre Project (Treslibre). Original work © Threema AG – Released under the AGPL-3.0 license',
         name: appName,
         electronVersion,
-        executableName: 'ThreemaDesktop',
+        executableName: 'TreslibreDesktop',
         dir: deployedAppDir,
         out: resolve(buildRootDir, 'packaged'),
         asar: {
@@ -607,7 +597,7 @@ async function packageApp(baseAppName, environment, mode, variant) {
             [import.meta.dirname, '..', 'src', 'rust', 'launcher'],
             flavor,
             outputPath,
-            'ThreemaDesktopLauncher',
+            'TreslibreDesktopLauncher',
         );
 
         if (process.platform === 'darwin') {
@@ -618,7 +608,7 @@ async function packageApp(baseAppName, environment, mode, variant) {
                 [import.meta.dirname, '..', 'src', 'rust', 'helper'],
                 flavor,
                 outputPath,
-                'ThreemaDesktopHelper',
+                'TreslibreDesktopHelper',
                 `${determineAppRdn(flavor, baseAppName)}-helper`,
                 true,
             );
@@ -663,7 +653,7 @@ if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
         }
         customAppName = customConfigOrError.appName;
     }
-    const baseAppName = customAppName ?? 'Threema';
+    const baseAppName = customAppName ?? 'Treslibre';
 
     await packageApp(baseAppName, environment, mode, variant).catch((error) => {
         fail(error);

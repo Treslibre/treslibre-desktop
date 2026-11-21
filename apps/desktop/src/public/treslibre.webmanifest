@@ -1,7 +1,7 @@
 {
-    "short_name": "Threema",
-    "name": "Threema Desktop",
-    "description": "Chat with Threema Desktop.",
+    "short_name": "Treslibre",
+    "name": "Treslibre Desktop",
+    "description": "Chat with Treslibre Desktop.",
     "icons": [
         {
             "src": "./res/icons/consumer-live/icon-64.png",
@@ -36,17 +36,6 @@
     ],
     "start_url": "./",
     "display": "standalone",
-    "theme_color": "#05a63f",
-    "background_color": "#ffffff",
-    "related_applications": [
-        {
-            "platform": "play",
-            "url": "https://play.google.com/store/apps/details?id=ch.threema.app",
-            "id": "ch.threema.app"
-        },
-        {
-            "platform": "itunes",
-            "url": "https://apps.apple.com/us/app/threema/id578665578"
-        }
-    ]
+    "theme_color": "#0e7c61",
+    "background_color": "#ffffff"
 }

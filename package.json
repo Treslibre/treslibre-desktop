@@ -1,11 +1,11 @@
 {
   "name": "threema-desktop-monorepo",
-  "description": "Use Threema on your Desktop",
-  "author": "Threema AG",
+  "description": "Use Treslibre on your Desktop",
+  "author": "Treslibre Project",
   "license": "AGPL-3.0+",
-  "homepage": "https://threema.ch/",
+  "homepage": "https://github.com/Treslibre/treslibre-desktop",
   "keywords": [
-    "threema",
+    "treslibre",
     "messenger",
     "communication"
   ],

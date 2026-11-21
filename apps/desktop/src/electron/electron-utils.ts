@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import * as os from 'node:os';
 import path from 'node:path';
 import * as process from 'node:process';
@@ -40,7 +41,7 @@ export function validateSenderFrame(senderFrame: Electron.WebFrameMain | null): 
     if (import.meta.env.DEBUG && senderFrame.url.startsWith('http://localhost:')) {
         return;
     }
-    if (senderFrame.url.startsWith('threemadesktop://')) {
+    if (senderFrame.url.startsWith('treslibredesktop://')) {
         return;
     }
     throw new Error(
@@ -51,13 +52,13 @@ export function validateSenderFrame(senderFrame: Electron.WebFrameMain | null): 
 /**
  * Return the path to the platform-specific application data base directory.
  *
- * - Linux / BSD: $XDG_DATA_HOME/ThreemaDesktop/ or ~/.local/share/ThreemaDesktop/
- * - macOS: ~/Library/Application Support/ThreemaDesktop/
- * - Windows: %APPDATA%/ThreemaDesktop/
- * - Other: ~/.ThreemaDesktop/
+ * - Linux / BSD: $XDG_DATA_HOME/TreslibreDesktop/ or ~/.local/share/TreslibreDesktop/
+ * - macOS: ~/Library/Application Support/TreslibreDesktop/
+ * - Windows: %APPDATA%/TreslibreDesktop/
+ * - Other: ~/.TreslibreDesktop/
  */
 export function getPersistentAppDataBaseDir(): string[] {
-    const rootDirectoryName = 'ThreemaDesktop';
+    const rootDirectoryName = 'TreslibreDesktop';
     switch (process.platform) {
         case 'linux':
         case 'freebsd':

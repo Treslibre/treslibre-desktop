@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 /**
  * Build a container image of the conferencing app and export it as a tarball.
  */
@@ -192,7 +193,7 @@ function main() {
     // is complemented by the git revision to be able to tell builds of the same version apart. See:
     // https://specs.opencontainers.org/image-spec/annotations/?v=v1.1.1#pre-defined-annotation-keys.
     const version = determineVersion();
-    const tag = `threema-conferencing:${version}`;
+    const tag = `treslibre-conferencing:${version}`;
     const labels = [`org.opencontainers.image.version=${version}`];
     const gitRevision = determineGitRevision();
     if (gitRevision !== undefined) {

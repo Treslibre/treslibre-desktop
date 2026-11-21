@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 // Build `libthreema` (WASM) from the included sources.
 
 import childProcess from 'node:child_process';
@@ -7,12 +8,19 @@ import path from 'node:path';
 // `packages/libthreema-wasm`).
 const rootDir = path.resolve(import.meta.dirname, '..');
 
+const bashExecutable =
+    process.platform === 'win32' ? 'C:\\Program Files\\Git\\bin\\bash.exe' : 'bash';
+
 try {
-    childProcess.execFileSync('bash', ['./tools/build-wasm.sh', '--target=web', '--no-container'], {
-        cwd: path.join(rootDir, 'libs', 'libthreema'),
-        encoding: 'utf-8',
-        stdio: 'inherit',
-    });
+    childProcess.execFileSync(
+        bashExecutable,
+        ['./tools/build-wasm.sh', '--target=web', '--no-container'],
+        {
+            cwd: path.join(rootDir, 'libs', 'libthreema'),
+            encoding: 'utf-8',
+            stdio: 'inherit',
+        },
+    );
 } catch (/** @type {any} */ error) {
     console.error(`\nERROR: Failed to build libthreema:\n${error}`);
     process.exit(1);

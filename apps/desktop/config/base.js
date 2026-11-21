@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 // @ts-check
 
 // Constants in this file are used in both build scripts and the main app code, so we use a plain JS
@@ -130,6 +131,8 @@ export function determineAppIdentifier(flavor, baseAppName) {
     const name = slugify(baseAppName.toLowerCase());
     switch (flavor) {
         case 'consumer-live':
+        case 'work-onprem':
+        case 'custom-onprem':
             return `${name}-desktop`;
         case 'consumer-sandbox':
             return `${name}-green-desktop`;
@@ -137,10 +140,6 @@ export function determineAppIdentifier(flavor, baseAppName) {
             return `${name}-work-desktop`;
         case 'work-sandbox':
             return `${name}-blue-desktop`;
-        case 'work-onprem':
-            return `${name}-onprem-desktop`;
-        case 'custom-onprem':
-            return `${name}-desktop`;
         default:
             return unreachable(flavor);
     }
@@ -153,34 +152,21 @@ export function determineAppIdentifier(flavor, baseAppName) {
  *
  * @param {BuildFlavor} flavor Build flavor to determine the app name for.
  * @param {string} baseAppName Name to use as the base for generating the flavored app name, e.g.
- *   "Threema".
+ *   "Treslibre".
  * @returns {string} Pretty app name for the given `flavor`.
  */
 export function determineAppName(flavor, baseAppName) {
-    let name = baseAppName;
     switch (flavor) {
         case 'consumer-live':
-            break;
         case 'consumer-sandbox':
-            name += ' Green';
-            break;
         case 'work-live':
-            name += ' Work';
-            break;
         case 'work-sandbox':
-            name += ' Blue';
-            break;
         case 'work-onprem':
-            name += ' OnPrem';
-            break;
         case 'custom-onprem':
-            // The full app name of custom builds is determined by their config.
-            break;
+            return baseAppName;
         default:
-            unreachable(flavor);
+            return unreachable(flavor);
     }
-    name += ' Beta';
-    return name;
 }
 
 /**
@@ -188,32 +174,21 @@ export function determineAppName(flavor, baseAppName) {
  *
  * @param {BuildFlavor} flavor Build flavor to determine the mobile app name for.
  * @param {string} baseAppName Name to use as the base for generating the flavored mobile app name,
- *   e.g. "Threema".
+ *   e.g. "Treslibre".
  * @returns {string} Pretty mobile app name for the given `flavor`.
  */
 export function determineMobileAppName(flavor, baseAppName) {
-    let name = baseAppName;
     switch (flavor) {
         case 'consumer-live':
-            break;
         case 'consumer-sandbox':
-            name += ' Green';
-            break;
         case 'work-live':
-            name += ' Work';
-            break;
         case 'work-sandbox':
-            name += ' Blue';
-            break;
         case 'work-onprem':
-            name += ' OnPrem';
-            break;
         case 'custom-onprem':
-            break;
+            return baseAppName;
         default:
-            unreachable(flavor);
+            return unreachable(flavor);
     }
-    return name;
 }
 
 /**
@@ -223,24 +198,19 @@ export function determineMobileAppName(flavor, baseAppName) {
  *
  * @param {BuildFlavor} flavor Build flavor to determine the app's reverse domain name name for.
  * @param {string} baseAppName Name to use as the base for generating the flavored RDN, e.g.
- *   "Threema".
+ *   "Treslibre".
  * @returns {string} Reverse domain name for the given `flavor`.
  */
 export function determineAppRdn(flavor, baseAppName) {
-    const name = slugify(baseAppName.toLowerCase());
+    void baseAppName;
     switch (flavor) {
         case 'consumer-live':
-            return `ch.${name}.${name}-desktop`;
         case 'consumer-sandbox':
-            return `ch.${name}.${name}-green-desktop`;
         case 'work-live':
-            return `ch.${name}.${name}-work-desktop`;
         case 'work-sandbox':
-            return `ch.${name}.${name}-blue-desktop`;
         case 'work-onprem':
-            return `ch.${name}.${name}-onprem-desktop`;
         case 'custom-onprem':
-            return `ch.${name}.${name}-desktop`;
+            return 'org.treslibre.app.desktop';
         default:
             return unreachable(flavor);
     }
@@ -253,7 +223,7 @@ export function determineAppRdn(flavor, baseAppName) {
  * @param {BuildFlavor} flavor The flavor to get the appropriate binary name for.
  * @param {BuildPlatform} platform The platform to get the appropriate binary name for.
  * @param {string} baseAppName Name to use as the base for generating the flavored binary name, e.g.
- *   "Threema".
+ *   "Treslibre".
  * @returns {string} App binary name for the given `flavor` and `platform`.
  */
 export function determineBinaryName(flavor, platform, baseAppName) {
@@ -261,9 +231,9 @@ export function determineBinaryName(flavor, platform, baseAppName) {
         case 'darwin':
             return `${determineAppName(flavor, baseAppName)}.app`;
         case 'win32':
-            return 'ThreemaDesktop.exe';
+            return 'TreslibreDesktop.exe';
         default:
-            return 'ThreemaDesktop';
+            return 'TreslibreDesktop';
     }
 }
 
@@ -316,31 +286,19 @@ export function determineInstallerName(appId, arch, platform, version) {
  * @returns {string} Pretty mobile app name for the given `flavor`.
  */
 export function determineMsixApplicationId(flavor, baseAppName) {
-    let applicationId;
     const slugifiedName = slugify(baseAppName);
     switch (flavor) {
         case 'consumer-live':
-            applicationId = `${slugifiedName}.Desktop.Consumer`;
-            break;
         case 'consumer-sandbox':
-            applicationId = `${slugifiedName}.Desktop.Green`;
-            break;
         case 'work-live':
-            applicationId = `${slugifiedName}.Desktop.Work`;
-            break;
         case 'work-sandbox':
-            applicationId = `${slugifiedName}.Desktop.Blue`;
-            break;
         case 'work-onprem':
-            applicationId = `${slugifiedName}.Desktop.OnPrem`;
-            break;
+            return `${slugifiedName}.Desktop`;
         case 'custom-onprem':
-            applicationId = slugifiedName;
-            break;
+            return slugifiedName;
         default:
-            unreachable(flavor);
+            return unreachable(flavor);
     }
-    return applicationId;
 }
 
 /**
@@ -353,17 +311,13 @@ export function determineMsixApplicationId(flavor, baseAppName) {
 export function determineDeepLinkScheme(flavor, customScheme) {
     switch (flavor) {
         case 'consumer-live':
-            return 'threema';
         case 'work-live':
-            return 'threemawork';
         case 'consumer-sandbox':
-            return 'threemagreen';
         case 'work-sandbox':
-            return 'threemablue';
         case 'work-onprem':
-            return 'threemaonprem';
+            return 'treslibre';
         case 'custom-onprem':
-            return customScheme ?? 'threemaonprem';
+            return customScheme ?? 'treslibre';
         default:
             return unreachable(flavor);
     }

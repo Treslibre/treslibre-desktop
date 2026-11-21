@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Treslibre
+Icon=org.treslibre.app.desktop
+Exec=
+StartupWMClass=Treslibre
+Categories=Network;InstantMessaging;Chat;
+Keywords=encryption;treslibre;privacy;chat;communications;

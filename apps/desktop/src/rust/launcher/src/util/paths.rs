@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 use common::util::constants::BUILD_FLAVOR;
 use std::{env, path::PathBuf};
 
@@ -19,15 +20,15 @@ pub fn get_windows_appdata_dir() -> PathBuf {
 
 /// Return the profile directory location based on operating system:
 ///
-/// - Linux / BSD: $XDG_DATA_HOME/ThreemaDesktop/ or ~/.local/share/ThreemaDesktop/
-/// - macOS: ~/Library/Application Support/ThreemaDesktop/
-/// - Windows: %APPDATA%/ThreemaDesktop/
-/// - Other: ~/.ThreemaDesktop/
+/// - Linux / BSD: $XDG_DATA_HOME/TreslibreDesktop/ or ~/.local/share/TreslibreDesktop/
+/// - macOS: ~/Library/Application Support/TreslibreDesktop/
+/// - Windows: %APPDATA%/TreslibreDesktop/
+/// - Other: ~/.TreslibreDesktop/
 ///
 /// Note: This must match the path determined by the application in `src/electron/electron-main.ts`
 /// by the function `getPersistentAppDataBaseDir`!
 pub fn get_persistent_app_data_base_dir() -> PathBuf {
-    let root_directory_name = "ThreemaDesktop";
+    let root_directory_name = "TreslibreDesktop";
     match env::consts::OS {
         "linux" | "freebsd" | "dragonfly" | "netbsd" | "openbsd" | "solaris" => {
             let xdg_data_home = env::var("XDG_DATA_HOME")
@@ -59,10 +60,10 @@ pub fn get_persistent_app_data_base_dir() -> PathBuf {
     }
 }
 
-/// Return the name of the threema profile directory, depending on the given args and the current
+/// Return the name of the profile directory, depending on the given args and the current
 /// app flavor.
 pub fn get_profile_directory_name(args: &[String]) -> String {
-    static PROFILE_DIRECTORY_FLAG_PREFIX: &str = "--threema-profile=";
+    static PROFILE_DIRECTORY_FLAG_PREFIX: &str = "--treslibre-profile=";
 
     let profile = match args
         .iter()

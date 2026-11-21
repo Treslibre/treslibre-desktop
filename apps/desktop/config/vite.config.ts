@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import * as fs from 'node:fs';
 import {builtinModules} from 'node:module';
 import * as process from 'node:process';
@@ -269,9 +270,9 @@ function makeConfig(pkg: PackageJson, env: ConfigEnv): Omit<ImportMeta['env'], '
                 : {full: currentConfig.presetOppfUrl};
         appIdentifier = currentConfig.appIdentifier;
     } else {
-        shortAppName = 'Threema';
+        shortAppName = 'Treslibre';
         deepLink = determineDeepLinkScheme(buildFlavor);
-        appName = determineAppName(buildFlavor, 'Threema');
+        appName = determineAppName(buildFlavor, 'Treslibre');
     }
 
     let buildPlatform: ImportMeta['env']['BUILD_PLATFORM'];
@@ -347,7 +348,7 @@ function makeConfig(pkg: PackageJson, env: ConfigEnv): Omit<ImportMeta['env'], '
         DEPRECATED_KEY_STORAGE_PATH: ['data', 'keystorage.pb3'],
         KEY_STORAGE_PATH: ['data', 'keystorage.bin'],
         FILE_STORAGE_PATH: ['data', 'files'],
-        DATABASE_PATH: ['data', 'threema.sqlite'],
+        DATABASE_PATH: ['data', 'treslibre.sqlite'],
         ELECTRON_SETTINGS_PATH: ['data', 'electron-settings.json'],
         ARGON2_MIN_MEMORY_BYTES: env.entry === 'mocha-tests' ? 100 * KiB : 128 * MiB,
         SAFE_STORAGE_PASSWORD_PATH: ['data', 'keystorage.password.bin'],
@@ -578,7 +579,7 @@ export default function defineConfig(viteEnv: ViteConfigEnv): UserConfig {
                           /^(?:cldr-.{8}|cldr-native-.{8}|data-.{8}|index-.{8}|messages-.{8})\.js$/u,
                       stylesheetRegExp: /^index-.{8}\.css$/u,
                       workerRegExp: /^(?:backend-worker-.{8}|media-crypto-worker-.{8})\.js$/u,
-                      workerSrcBaseUrl: 'threemadesktop://app/',
+                      workerSrcBaseUrl: 'treslibredesktop://app/',
                   })
                 : undefined,
     } as const;

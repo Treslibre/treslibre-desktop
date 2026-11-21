@@ -12,10 +12,10 @@ FROM docker.io/svenstaro/miniserve:${MINISERVE_VERSION}-alpine@${MINISERVE_DIGES
 
 # Note: The `org.opencontainers.image.version` and `org.opencontainers.image.revision` labels are
 # added at build time by `packaging/build-container-image.mjs`.
-LABEL org.opencontainers.image.title="Threema Conferencing" \
-      org.opencontainers.image.description="Threema Conferencing web app, served as static files." \
-      org.opencontainers.image.vendor="Threema AG" \
-      org.opencontainers.image.url="https://threema.ch/" \
+LABEL org.opencontainers.image.title="Treslibre Conferencing" \
+      org.opencontainers.image.description="Treslibre Conferencing web app, served as static files." \
+      org.opencontainers.image.vendor="Treslibre Project" \
+      org.opencontainers.image.url="https://github.com/Treslibre/treslibre-desktop" \
       org.opencontainers.image.licenses="AGPL-3.0-or-later"
 
 # Run as an unprivileged user instead of `root`.
@@ -24,7 +24,7 @@ LABEL org.opencontainers.image.title="Threema Conferencing" \
 # not invalidate the layer cache of the `RUN`.
 ARG USER_UID=1000
 ARG USER_GID=1000
-ARG USER_NAME=threema
+ARG USER_NAME=treslibre
 RUN addgroup -g ${USER_GID} ${USER_NAME} \
  && adduser -D -H -u ${USER_UID} -G ${USER_NAME} -s /sbin/nologin ${USER_NAME}
 # Note: The user is referenced by UID and GID (instead of by `${USER_NAME}`), because Kubernetes can

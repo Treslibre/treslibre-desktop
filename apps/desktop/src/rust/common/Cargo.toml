@@ -1,9 +1,9 @@
 [package]
 name = "common"
 version = "1.0.0"
-authors = ["Gian-Reto Tarnutzer <gian.reto.tarnutzer@threema.ch>"]
+authors = ["Treslibre Project", "Gian-Reto Tarnutzer"]
 edition = "2021"
-homepage = "https://threema.ch/"
+homepage = "https://github.com/Treslibre/treslibre-desktop"
 publish = false
 
 [dependencies]

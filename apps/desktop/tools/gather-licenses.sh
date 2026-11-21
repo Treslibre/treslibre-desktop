@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+# Modified 2026 by Treslibre Project (Treslibre).
 #
 # Regenerate `LICENSE-3RD-PARTY.txt` in the repository root, which bundles the licenses of all third
-# party libraries shipped with Threema for Desktop.
+# party libraries shipped with Treslibre for Desktop.
 
 set -euo pipefail
 
@@ -57,7 +58,7 @@ fi
 # Note: Some libraries ship their license with CRLF line endings, so normalise them to LF to keep
 # the generated file stable regardless of the platform it was generated on.
 {
-    echo -e "Licenses for third party libraries in Threema for Desktop:\n\n\n\n"
+    echo -e "Licenses for third party libraries in Treslibre for Desktop:\n\n\n\n"
     for i in "${!LICENSE_FILES[@]}"; do
         if (( i % 2 == 0 )); then
             echo -e "----------"

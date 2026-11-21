@@ -118,9 +118,9 @@
         "GITLAB_CI",
         "MINIDUMP_ENDPOINT",
         "SENTRY_DSN",
-        "THREEMADESKTOP_FLATPAK_BRANCH",
-        "THREEMADESKTOP_FLATPAK_GPG_KEY",
-        "THREEMADESKTOP_FLATPAK_REPO_PATH",
+        "TRESLIBREDESKTOP_FLATPAK_BRANCH",
+        "TRESLIBREDESKTOP_FLATPAK_GPG_KEY",
+        "TRESLIBREDESKTOP_FLATPAK_REPO_PATH",
         "TURBO_BUILD_ENVIRONMENT",
         "TURBO_BUILD_VARIANT",
         "TURBO_PACKAGE_SIGNATURE",
@@ -139,7 +139,7 @@
         "packaging/flatpak/.flatpak-builder/**",
         "packaging/flatpak/build/**",
         "packaging/flatpak/repo/**",
-        "packaging/flatpak/ch.threema.*-desktop.yml",
+        "packaging/flatpak/org.treslibre.*-desktop.yml",
         "packaging/flatpak/generated-cargo-sources.json"
       ]
     },
