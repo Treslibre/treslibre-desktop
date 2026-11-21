@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {base64ToU8a} from '@threema/ts-utils/base64/base64-to-u8a';
 import {byteToHex} from '@threema/ts-utils/byte/byte-to-hex';
 import type {u53} from '@threema/ts-utils/integer/u53';
@@ -184,7 +185,7 @@ export const STATIC_CONFIG: Pick<
     KEY_STORAGE_PATH: import.meta.env.KEY_STORAGE_PATH,
     FILE_STORAGE_PATH: import.meta.env.FILE_STORAGE_PATH,
     DATABASE_PATH: import.meta.env.DATABASE_PATH,
-    USER_AGENT: `Threema Desktop/${import.meta.env.BUILD_VERSION} (${
+    USER_AGENT: `Treslibre Desktop/${import.meta.env.BUILD_VERSION} (${
         import.meta.env.BUILD_VARIANT
     }, ${import.meta.env.BUILD_TARGET})`,
     ONPREM_CONFIG_TRUSTED_PUBLIC_KEYS: import.meta.env.ONPREM_CONFIG_TRUSTED_PUBLIC_KEYS.map(

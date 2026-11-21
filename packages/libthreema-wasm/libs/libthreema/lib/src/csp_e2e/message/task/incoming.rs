@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 //! Task for processing an incoming message.
 use core::mem;
 use std::str;
@@ -1427,7 +1428,7 @@ mod tests {
                     latitude: 47.202952,
                     longitude: 8.778079,
                     accuracy_m: Some(0.0_f64),
-                    name: Some("Pfäffikon SZ".to_owned()),
+                    name: Some("Zürich".to_owned()),
                     address: Some("Unknown address".to_owned()),
                 })),
             }
@@ -2548,7 +2549,7 @@ mod tests {
                 longitude: 8.78350732499435,
                 accuracy_m: Some(5_f64),
                 name: Some("Thermalbad".to_owned()),
-                address: Some("Churerstrasse 82\n8808 Pfäffikon".to_owned()),
+                address: Some("Churerstrasse 82\n8808 Zürich".to_owned()),
              }),
         )]
         outgoing_message_body: ContactMessageBody,

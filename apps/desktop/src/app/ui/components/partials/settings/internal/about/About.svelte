@@ -251,24 +251,6 @@
       </SubstitutableText>
     </KeyValueList.Item>
   </KeyValueList.Section>
-  <!-- In onprem builds, we don't show privacy information for simplicity.-->
-  {#if import.meta.env.BUILD_ENVIRONMENT !== 'onprem'}
-    <KeyValueList.Section
-      title={$i18n.t('settings--about.label--privacy-information', 'Privacy Information')}
-    >
-      <KeyValueList.Item key={$i18n.t('settings--about.label--privacy-policy', 'Privacy Policy')}>
-        {@const url =
-          // Disabling linter rule since we exclude onprem so build variant can never be custom.
-          // eslint-disable-next-line threema/compare-work-and-custom
-          import.meta.env.BUILD_VARIANT === 'work'
-            ? 'https://threema.com/privacy_policy?version=5.5k'
-            : 'https://threema.com/privacy_policy?version=5.5'}
-        <a href={url} target="_blank" rel="noreferrer noopener">
-          {url.split('?')[0]}
-        </a>
-      </KeyValueList.Item>
-    </KeyValueList.Section>
-  {/if}
 
   <KeyValueList.Section
     title={$i18n.t('settings--about.label--troubleshooting', 'Troubleshooting')}
@@ -294,10 +276,8 @@
       </KeyValueList.ItemWithSwitch>
 
       {#if isLoggerEnabled}
-        <KeyValueList.ItemWithButton icon="send" key="" onclick={handleClickSendLogsToSupport}>
-          <Text
-            text={$i18n.t('settings--about.action--send-logs-to-support', 'Send Logs to Support')}
-          />
+        <KeyValueList.ItemWithButton icon="download" key="" onclick={handleClickSendLogsToSupport}>
+          <Text text={$i18n.t('settings--about.action--send-logs-to-support', 'Export Logs')} />
         </KeyValueList.ItemWithButton>
         <KeyValueList.ItemWithButton
           icon="delete_forever"

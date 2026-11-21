@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {expect} from 'chai';
 
 import {ParseError} from '~/common/error';
@@ -27,7 +28,7 @@ export function run(): void {
 
         it('parse a 3-line location message', function () {
             assertParsedLocation(
-                '47.201973,8.787087,0.000000\nPizzeria Da Franco\nChurerstrasse 109 Pfäffikon, 8808 Freienbach, Switzerland',
+                '47.201973,8.787087,0.000000\nPizzeria Da Franco\nBahnhofstrasse 109 Zürich, 8808 Freienbach, Switzerland',
                 {
                     coordinates: {
                         lat: 47.201973,
@@ -35,7 +36,7 @@ export function run(): void {
                         accuracy: 0.0,
                     },
                     name: 'Pizzeria Da Franco',
-                    address: 'Churerstrasse 109 Pfäffikon, 8808 Freienbach, Switzerland',
+                    address: 'Bahnhofstrasse 109 Zürich, 8808 Freienbach, Switzerland',
                 },
             );
         });

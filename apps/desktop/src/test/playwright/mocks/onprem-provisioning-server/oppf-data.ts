@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 /**
  * OPPF payload generation for the mock OnPrem provisioning server.
  *
@@ -32,7 +33,7 @@ interface DomainsRule {
  */
 function getMockDomainsRuleForSpki(spki: string): DomainsRule {
     return {
-        fqdn: '*.3ma.ch',
+        fqdn: '*.treslibre.invalid',
         matchMode: 'include-subdomains',
         spkis: [
             {
@@ -145,18 +146,18 @@ function createOppfString(options: {
     readonly licenseExpiry: string;
 }): string {
     const body: Record<string, unknown> = {
-        avatar: {url: 'https://devon.3ma.ch/avatar/'},
+        avatar: {url: 'https://devon.treslibre.invalid/avatar/'},
         blob: {
-            uploadUrl: 'https://devon.3ma.ch/blob/upload',
-            downloadUrl: 'https://devon.3ma.ch/blob/{blobId}',
-            doneUrl: 'https://devon.3ma.ch/blob/{blobId}/done',
+            uploadUrl: 'https://devon.treslibre.invalid/blob/upload',
+            downloadUrl: 'https://devon.treslibre.invalid/blob/{blobId}',
+            doneUrl: 'https://devon.treslibre.invalid/blob/{blobId}/done',
         },
         chat: {
-            hostname: 'devon.3ma.ch',
+            hostname: 'devon.treslibre.invalid',
             publicKey: 'Q7GorvVQh9L6QVxFxCgh2JaCj1bd/mhJ7+2FkofIPTk=',
             ports: [5222],
         },
-        directory: {url: 'https://devon.3ma.ch/directory/'},
+        directory: {url: 'https://devon.treslibre.invalid/directory/'},
         features: {remoteSecret: {}, aadSync: {}},
         license: {
             expires: options.licenseExpiry,
@@ -165,20 +166,20 @@ function createOppfString(options: {
         },
         mediator: {
             blob: {
-                uploadUrl: 'https://devon.3ma.ch/mediator/blob/upload',
-                downloadUrl: 'https://devon.3ma.ch/mediator/blob/{blobId}',
-                doneUrl: 'https://devon.3ma.ch/mediator/blob/{blobId}/done',
+                uploadUrl: 'https://devon.treslibre.invalid/mediator/blob/upload',
+                downloadUrl: 'https://devon.treslibre.invalid/mediator/blob/{blobId}',
+                doneUrl: 'https://devon.treslibre.invalid/mediator/blob/{blobId}/done',
             },
-            url: 'wss://devon.3ma.ch/mediator/',
+            url: 'wss://devon.treslibre.invalid/mediator/',
         },
         refresh: 86400,
-        rendezvous: {url: 'wss://devon.3ma.ch/rendezvous/'},
-        safe: {url: 'https://devon.3ma.ch/safe/'},
+        rendezvous: {url: 'wss://devon.treslibre.invalid/rendezvous/'},
+        safe: {url: 'https://devon.treslibre.invalid/safe/'},
         signatureKey: Buffer.from(options.keypair.publicKey).toString('base64'),
         updates: {desktop: {autoUpdate: true}},
         version: '1.0',
-        web: {url: 'https://devon.3ma.ch/web/'},
-        work: {url: 'https://devon.3ma.ch/work/'},
+        web: {url: 'https://devon.treslibre.invalid/web/'},
+        work: {url: 'https://devon.treslibre.invalid/work/'},
     };
     // `domains` is intentionally omitted when no rules are provided to test the `no-domains`
     // variant. An empty `rules: []` is preserved verbatim.

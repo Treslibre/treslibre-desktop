@@ -1,5 +1,6 @@
 <!--
   @component Renders a system dialog to force activation of Remote Secrets.
+  Modified 2026 by Treslibre Project (Treslibre).
 -->
 <script lang="ts">
   import SubstitutableText from '~/app/ui/SubstitutableText.svelte';
@@ -79,9 +80,7 @@
         )}
       >
         {#snippet slot_1(text)}
-          <a href="https://threema.com/faq/duallock" target="_blank" rel="noreferrer noopener">
-            {text}
-          </a>
+          <span>{text}</span>
         {/snippet}
       </SubstitutableText>
     </div>

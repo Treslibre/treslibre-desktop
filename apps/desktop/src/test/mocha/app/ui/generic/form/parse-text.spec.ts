@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {expect} from 'chai';
 
 import {
@@ -213,23 +214,23 @@ export function run(): void {
             const testCases = [
                 {
                     description: 'link without url scheme',
-                    input: ensureSanitizedHtml('threema.ch'),
-                    expected: linkHtmlTemplate({url: 'https://threema.ch', text: 'threema.ch'}),
+                    input: ensureSanitizedHtml('example.org'),
+                    expected: linkHtmlTemplate({url: 'https://example.org', text: 'example.org'}),
                 },
                 {
                     description: 'link with "http" url scheme',
-                    input: ensureSanitizedHtml('http://threema.ch'),
+                    input: ensureSanitizedHtml('http://example.org'),
                     expected: linkHtmlTemplate({
-                        url: 'http://threema.ch',
-                        text: 'http://threema.ch',
+                        url: 'http://example.org',
+                        text: 'http://example.org',
                     }),
                 },
                 {
                     description: 'link with "https" url scheme',
-                    input: ensureSanitizedHtml('https://threema.ch'),
+                    input: ensureSanitizedHtml('https://example.org'),
                     expected: linkHtmlTemplate({
-                        url: 'https://threema.ch',
-                        text: 'https://threema.ch',
+                        url: 'https://example.org',
+                        text: 'https://example.org',
                     }),
                 },
                 {
@@ -328,7 +329,7 @@ export function run(): void {
                 {
                     description:
                         'should parse multiple occurrences of markup, mentions, highlights, and links',
-                    input: 'Hello, @[ECHOECHO]! Hello, *world*. Lorem *ipsum*, @[ECHOECHO] dolor: threema.ch or https://threema.ch.',
+                    input: 'Hello, @[ECHOECHO]! Hello, *world*. Lorem *ipsum*, @[ECHOECHO] dolor: example.org or https://example.org.',
                     features: {
                         markup: true,
                         mentions: [testMentions.contact],
@@ -344,11 +345,11 @@ export function run(): void {
                         text: 'ipsum',
                         formatting: 'bold',
                     })}, ${mentionHtmlTemplate(testMentions.contact)} dolor: ${linkHtmlTemplate({
-                        url: 'https://threema.ch',
-                        text: 'threema.ch',
+                        url: 'https://example.org',
+                        text: 'example.org',
                     })} or ${linkHtmlTemplate({
-                        url: 'https://threema.ch',
-                        text: 'https://threema.ch',
+                        url: 'https://example.org',
+                        text: 'https://example.org',
                     })}.`,
                 },
                 {
@@ -425,7 +426,7 @@ export function run(): void {
                 {
                     skipped: true,
                     description: 'highlight parsing should not break up links',
-                    input: 'More on threema.ch',
+                    input: 'More on example.org',
                     features: {
                         markup: false,
                         mentions: [],
@@ -433,8 +434,8 @@ export function run(): void {
                         links: true,
                     },
                     expected: `More on ${linkHtmlTemplate({
-                        url: 'https://threema.ch',
-                        text: 'threema.ch',
+                        url: 'https://example.org',
+                        text: 'example.org',
                     })}`,
                 },
                 // TODO(DESK-1069): The following test case currently fails and is skipped. Make it
@@ -465,7 +466,7 @@ export function run(): void {
                         mentions: [
                             {
                                 ...testMentions.contact,
-                                name: 'https://threema.ch',
+                                name: 'https://example.org',
                             },
                         ],
                         highlights: [],
@@ -473,7 +474,7 @@ export function run(): void {
                     },
                     expected: `Hello, ${mentionHtmlTemplate({
                         ...testMentions.contact,
-                        name: 'https://threema.ch',
+                        name: 'https://example.org',
                     })}!`,
                 },
                 {
@@ -485,7 +486,7 @@ export function run(): void {
                         mentions: [
                             {
                                 ...testMentions.contact,
-                                name: 'https://threema.ch',
+                                name: 'https://example.org',
                             },
                         ],
                         highlights: [],
@@ -494,7 +495,7 @@ export function run(): void {
                     },
                     expected: `Hello, ${mentionHtmlTemplate({
                         ...testMentions.contact,
-                        name: 'https://threema.ch',
+                        name: 'https://example.org',
                         linkMentions: false,
                     })}!`,
                 },

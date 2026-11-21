@@ -1501,7 +1501,7 @@ function main(
         switch (import.meta.env.BUILD_ENVIRONMENT) {
             case 'live':
             case 'sandbox':
-                connectSrcRule = "connect-src 'self' https://*.threema.ch wss://*.threema.ch";
+                connectSrcRule = "connect-src 'self'";
                 break;
 
             case 'onprem':
@@ -1529,7 +1529,7 @@ function main(
                         "manifest-src 'self'",
                         "child-src 'none'",
                         connectSrcRule,
-                        "font-src 'self' https://static.threema.ch",
+                        "font-src 'self'",
                         "frame-src 'none'",
                         "img-src 'self' data: blob:",
                         "media-src 'self' data: blob:",
@@ -1578,7 +1578,7 @@ function main(
         });
 
         // Disable the dictionary for good
-        session.setSpellCheckerDictionaryDownloadURL('https://threema.invalid/');
+        session.setSpellCheckerDictionaryDownloadURL('https://treslibre.invalid/');
         session.setSpellCheckerEnabled(electronSettings.spellCheck.enabled);
 
         // Register request handler for screen sharing
@@ -1688,22 +1688,13 @@ function main(
     // In internal test builds on sandbox, we enable crash reporting.
     //
     // No automatic crash reporting or telemetry of any kind is being done in production builds!
-    electron.crashReporter.start(
-        import.meta.env.MINIDUMP_ENDPOINT === undefined
-            ? {
-                  // eslint-disable-next-line @typescript-eslint/naming-convention
-                  submitURL: 'https://threema.invalid/crash-report',
-                  uploadToServer: false,
-                  ignoreSystemCrashHandler: true,
-              }
-            : {
-                  // eslint-disable-next-line @typescript-eslint/naming-convention
-                  submitURL: import.meta.env.MINIDUMP_ENDPOINT,
-                  companyName: 'Treslibre',
-                  productName: import.meta.env.APP_NAME,
-                  ignoreSystemCrashHandler: true,
-              },
-    );
+    // Outbound minidump crash reporting is permanently disabled in Treslibre.
+    electron.crashReporter.start({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        submitURL: 'https://treslibre.invalid/crash-report',
+        uploadToServer: false,
+        ignoreSystemCrashHandler: true,
+    });
 
     // Handle renderer crashes
     electron.app.on('render-process-gone', (_, contents, details) => {

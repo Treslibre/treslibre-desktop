@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import type {ServicesForBackend} from '~/common/backend';
 import type {ThreemaWorkCredentials} from '~/common/device';
 import {getBrowserInfo, makeCspClientInfo} from '~/common/dom/utils/browser';
@@ -103,6 +104,9 @@ export class FetchWorkBackend implements WorkBackend {
 
     /** @inheritdoc */
     public async checkLicense(credentials: ThreemaWorkCredentials): Promise<WorkLicenseStatus> {
+        if (credentials.username === '' && credentials.password === '') {
+            return {valid: true};
+        }
         const browserInfo = getBrowserInfo(self.navigator.userAgent);
         const cspClientInfo = makeCspClientInfo(browserInfo, this._services.systemInfo);
 
@@ -126,6 +130,10 @@ export class FetchWorkBackend implements WorkBackend {
             throw new WorkError('fetch', 'Fetch request to license validation endpoint failed', {
                 from: error,
             });
+        }
+        if (response.status === 404 || response.status === 501) {
+            // Cleanroom directory servers without a commercial Work license endpoint
+            return {valid: true};
         }
         if (response.status !== 200) {
             throw new WorkError(

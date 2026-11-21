@@ -110,55 +110,22 @@ function determineBuildFlavor(variant: BuildVariant, environment: BuildEnvironme
 function makeBuildConfig(environment: BuildEnvironment): BuildConfig {
     switch (environment) {
         case 'live':
-            return {
-                // prettier-ignore
-                CHAT_SERVER_KEY: [
-                    0x45, 0x0b, 0x97, 0x57, 0x35, 0x27, 0x9f, 0xde,
-                    0xcb, 0x33, 0x13, 0x64, 0x8f, 0x5f, 0xc6, 0xee,
-                    0x9f, 0xf4, 0x36, 0x0e, 0xa9, 0x2a, 0x8c, 0x17,
-                    0x51, 0xc6, 0x61, 0xe4, 0xc0, 0xd8, 0xc9, 0x09,
-                ],
-                // TODO(DESK-821): Implement support for alternative server key
-                MEDIATOR_SERVER_URL:
-                    'wss://mediator-{deviceGroupIdPrefix4}.threema.ch/{deviceGroupIdPrefix8}/',
-                DIRECTORY_SERVER_URL: 'https://ds-apip.threema.ch/',
-                BLOB_SERVER_URL:
-                    'https://blob-mirror-{deviceGroupIdPrefix4}.threema.ch/{deviceGroupIdPrefix8}/',
-                SAFE_SERVER_URL: 'https://safe-{backupIdPrefix8}.threema.ch/',
-                RENDEZVOUS_SERVER_URL:
-                    'wss://rendezvous-{rendezvousPathPrefix4}.threema.ch/{rendezvousPathPrefix8}/',
-                WORK_SERVER_LEGACY_URL: 'https://ds-apip-work.threema.ch/',
-                WORK_SERVER_URL: 'https://work.threema.ch/',
-                UPDATE_SERVER_URL: 'https://releases.threema.ch/desktop/',
-
-                // We don't do any automatic crash reporting for our live (consumer) builds
-                SENTRY_DSN: undefined,
-                MINIDUMP_ENDPOINT: undefined,
-            };
         case 'sandbox':
             return {
-                // prettier-ignore
-                CHAT_SERVER_KEY: [
-                    0x5a, 0x98, 0xf2, 0x3d, 0xe6, 0x56, 0x05, 0xd0,
-                    0x50, 0xdc, 0x00, 0x64, 0xbe, 0x07, 0xdd, 0xdd,
-                    0x81, 0x1d, 0xa1, 0x16, 0xa5, 0x43, 0xce, 0x43,
-                    0xaa, 0x26, 0x87, 0xd1, 0x9f, 0x20, 0xaf, 0x3c,
-                ],
+                CHAT_SERVER_KEY: Array.from({length: 32}, () => 0),
                 MEDIATOR_SERVER_URL:
-                    'wss://mediator-{deviceGroupIdPrefix4}.test.threema.ch/{deviceGroupIdPrefix8}/',
-                DIRECTORY_SERVER_URL: 'https://ds-apip.test.threema.ch/',
+                    'wss://mediator-{deviceGroupIdPrefix4}.treslibre.invalid/{deviceGroupIdPrefix8}/',
+                DIRECTORY_SERVER_URL: 'https://directory.treslibre.invalid/',
                 BLOB_SERVER_URL:
-                    'https://blob-mirror-{deviceGroupIdPrefix4}.test.threema.ch/{deviceGroupIdPrefix8}/',
-                SAFE_SERVER_URL: 'https://safe-{backupIdPrefix8}.threema.ch/', // Does not have a sandboxed version
+                    'https://blob-{deviceGroupIdPrefix4}.treslibre.invalid/{deviceGroupIdPrefix8}/',
+                SAFE_SERVER_URL: 'https://safe-{backupIdPrefix8}.treslibre.invalid/',
                 RENDEZVOUS_SERVER_URL:
-                    'wss://rendezvous-{rendezvousPathPrefix4}.test.threema.ch/{rendezvousPathPrefix8}/',
-                WORK_SERVER_LEGACY_URL: 'https://ds-apip-work.test.threema.ch/',
-                WORK_SERVER_URL: 'https://work.test.threema.ch/',
-                UPDATE_SERVER_URL: 'https://releases.threema.ch/desktop/',
-
-                // Only enabled for internal test builds on sandbox, if set through env variable
-                SENTRY_DSN: process.env.SENTRY_DSN,
-                MINIDUMP_ENDPOINT: process.env.MINIDUMP_ENDPOINT,
+                    'wss://rendezvous-{rendezvousPathPrefix4}.treslibre.invalid/{rendezvousPathPrefix8}/',
+                WORK_SERVER_LEGACY_URL: 'https://work.treslibre.invalid/',
+                WORK_SERVER_URL: 'https://work.treslibre.invalid/',
+                UPDATE_SERVER_URL: 'https://updates.treslibre.invalid/desktop/',
+                SENTRY_DSN: undefined,
+                MINIDUMP_ENDPOINT: undefined,
             };
 
         // These will be loaded from an .oppf file while initializing the backend
@@ -172,7 +139,7 @@ function makeBuildConfig(environment: BuildEnvironment): BuildConfig {
                 RENDEZVOUS_SERVER_URL: undefined,
                 WORK_SERVER_LEGACY_URL: undefined,
                 WORK_SERVER_URL: undefined,
-                UPDATE_SERVER_URL: 'https://releases.threema.ch/desktop/',
+                UPDATE_SERVER_URL: 'https://updates.treslibre.invalid/desktop/',
 
                 // We don't do any automatic crash reporting for our on premise builds
                 SENTRY_DSN: undefined,
@@ -187,34 +154,12 @@ function determineUrls(
     buildFlavor: BuildFlavor,
     presetOppfUrl: {readonly full: string} | undefined,
 ): ImportMeta['env']['URLS'] {
-    let downloadAndInfoShort;
-    let downloadAndInfoForOtherVariantShort;
-    let overviewFull;
-    let support;
     switch (buildFlavor) {
         case 'consumer-live':
         case 'consumer-sandbox':
-            downloadAndInfoShort = 'three.ma/md';
-            downloadAndInfoForOtherVariantShort = 'three.ma/mdw';
-            overviewFull = 'https://threema.ch/faq/md_overview';
-            support = {full: 'https://threema.com/support-request'};
-            break;
-
         case 'work-live':
         case 'work-sandbox':
-            downloadAndInfoShort = 'three.ma/mdw';
-            downloadAndInfoForOtherVariantShort = 'three.ma/md';
-            overviewFull = 'https://threema.ch/work/support/mdw_overview';
-            support = 'hidden' as const;
-            break;
-
         case 'work-onprem':
-            downloadAndInfoShort = 'three.ma/mdo';
-            downloadAndInfoForOtherVariantShort = 'three.ma/md';
-            overviewFull = 'https://threema.ch/work/support#onprem';
-            support = 'hidden' as const;
-            break;
-
         case 'custom-onprem':
             return {
                 downloadAndInfo: 'hidden',
@@ -223,26 +168,13 @@ function determineUrls(
                 limitations: 'hidden',
                 forgotPassword: 'hidden',
                 resetProfile: 'hidden',
-                presetOppfUrl,
+                presetOppfUrl: buildFlavor === 'custom-onprem' ? presetOppfUrl : undefined,
                 support: 'hidden',
             };
 
         default:
-            unreachable(buildFlavor);
+            return unreachable(buildFlavor);
     }
-    return {
-        downloadAndInfo: {short: downloadAndInfoShort, full: `https://${downloadAndInfoShort}`},
-        downloadAndInfoForOtherVariant: {
-            short: downloadAndInfoForOtherVariantShort,
-            full: `https://${downloadAndInfoForOtherVariantShort}`,
-        },
-        overview: {full: overviewFull},
-        limitations: {full: 'https://threema.ch/faq/md_limit'},
-        forgotPassword: {full: 'https://threema.ch/faq/md_password'},
-        resetProfile: {full: 'https://threema.ch/faq/md_reset'},
-        presetOppfUrl: undefined,
-        support,
-    };
 }
 
 function makeConfig(pkg: PackageJson, env: ConfigEnv): Omit<ImportMeta['env'], 'BASE_URL'> {
@@ -296,12 +228,8 @@ function makeConfig(pkg: PackageJson, env: ConfigEnv): Omit<ImportMeta['env'], '
     // that signatures produced by the mock server pass verification at runtime.
     const ONPREM_CONFIG_TEST_PUBLIC_KEY = env.mode === 'testing' ? [readOppfTestPublicKey()] : [];
 
-    // Trusted OnPrem config public signature keys
-    const ONPREM_CONFIG_TRUSTED_PUBLIC_KEYS = [
-        'ek1qBp4DyRmLL9J5sCmsKSfwbsiGNB4veDAODjkwe/k=',
-        'Hrk8aCjwKkXySubI7CZ3y9Sx+oToEHjNkGw98WSRneU=',
-        '5pEn1T/5bhecNWrp9NgUQweRfgVtu/I8gRb3VxGP7k4=',
-    ];
+    // Trusted OnPrem config public signature keys (allowlist removed in Treslibre TOFU model)
+    const ONPREM_CONFIG_TRUSTED_PUBLIC_KEYS: readonly string[] = [];
 
     return {
         // Dev
@@ -361,66 +289,8 @@ function makeConfig(pkg: PackageJson, env: ConfigEnv): Omit<ImportMeta['env'], '
 
         ONPREM_APP_IDENTIFIER: appIdentifier,
 
-        // Public-key pins (HPKP)
-        TLS_CERTIFICATE_PINS:
-            env.environment !== 'onprem'
-                ? [
-                      {
-                          fqdn: '*.threema.ch',
-                          matchMode: 'include-subdomains',
-                          spkis: [
-                              'vGQZ8hm2h+km+q7rnJ7kF9S17BwSY0rbhwjz6nIupf0=',
-                              '3L0bKTNfTwVUCjYqqhZXJIO03qC00bSnuxZFsb09OUo=',
-                              'NN6Lb+2AE7CN3HWZKoWOe6mmHROOnywWoKZYWL1oHIU=',
-                              'efJCZofFPR3oV/bBk0wmehqnhy3Vv+s9P+3sjhHem/E=',
-                              '2Vpy8qUQCqc2+Lg6BgRO8G6e6vh7NmvVHTljfwP/Pfk=',
-                              'KKBJHJn1PQSdNTmoAfhxqWTO61r8O8bPi/JeGtP/6gg=',
-                          ].map((value) => ({
-                              algorithm: 'sha256',
-                              value,
-                          })),
-                      },
-                      {
-                          fqdn: '*.threema.com',
-                          matchMode: 'include-subdomains',
-                          spkis: [
-                              'saKwtUPx8bCj9CW+c55nU2jb4aOpr0vBD8XMJveXq34=',
-                              'nZWRY8rNSEqxjQDQjaunWlUL+YBOTK1xN5Bb0wMq/K0=',
-                              '5AfgU7xFqhx5AS69cQZlAGv6JpmLm0A+Z6yBrLPOCP8=',
-                              'GGSYKwkV3h6SRIY16Ixsh8LEKuGuhx3B4CamRde4xgY=',
-                              'oD0JGdy32wZtoUT4n9ac3HLOgEosnx2kq+qaJnmtsQk=',
-                              'j4n4RTr0MLfQ3gBmONIFreXDq5/Kkb2oquVTmq0n5pI=',
-                          ].map((value) => ({
-                              algorithm: 'sha256',
-                              value,
-                          })),
-                      },
-                      {
-                          fqdn: '*.test.threema.ch',
-                          matchMode: 'include-subdomains',
-                          spkis: [
-                              'Dvvb0s1E8Y2tG67GoyzIkmJNAebvOqQjz4TnPMq3yhI=',
-                              'bmsGGaIGEs1HWAUIE082NSPYTURvChScDmE7PjL+5RQ=',
-                          ].map((value) => ({
-                              algorithm: 'sha256',
-                              value,
-                          })),
-                      },
-                      {
-                          fqdn: '*.sfu.threema.ch',
-                          matchMode: 'include-subdomains',
-                          spkis: [
-                              'useMPV2qPBEgxVucMPuqexG27L64zFAksHh9BehZpY0=',
-                              '88JttF0tDWrGT6g8H9uEZ0T8xosvZtZwWlsZuD4NvHA=',
-                              'F82gDLif130AsVx454ZsMxPGl9EpzB5LqY39CzVKWDQ=',
-                              'Jo4Re5X+mksn/Ankgrnov07caZwkkT8NezJMQf1i8cI=',
-                          ].map((value) => ({
-                              algorithm: 'sha256',
-                              value,
-                          })),
-                      },
-                  ]
-                : undefined,
+        // Public-key pins (HPKP) — verified dynamically via TOFU Observation Store
+        TLS_CERTIFICATE_PINS: undefined,
 
         // Verbose debug logging
         VERBOSE_LOGGING: {

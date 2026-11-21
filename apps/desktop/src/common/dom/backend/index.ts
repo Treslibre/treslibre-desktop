@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {TweetNaClBackend} from '@threema/crypto/tweetnacl';
 import type {ClientInfo} from '@threema/libthreema-wasm';
 import {NonceScope} from '@threema/protocol/enum';
@@ -942,9 +943,8 @@ export class Backend {
         // In OnPrem builds, the config needs to be initialized based on the OPPF (On-Prem Provisioning File).
         // In other builds, the config is static.
         let config: Config;
-        // Whether or not to check if updates are available on the Threema Servers. Will be false if
-        // this is an OnPrem build and the .oppf file specifies not to check for updates.
-        let checkForUpdates: boolean = true;
+        // Outbound auto-update polling is disabled by default unless an OnPrem config explicitly enables a non-placeholder update server.
+        let checkForUpdates: boolean = false;
 
         // Try to read the credentials from the key storage.
         //
@@ -1391,7 +1391,7 @@ export class Backend {
         let oppfConfig: OppfFetchConfig | undefined;
         let oppfFile: {readonly parsed: oppf.OppfFile; readonly string: string} | undefined;
         let workCredentials: ThreemaWorkCredentials | undefined;
-        let checkForUpdates: boolean = true;
+        let checkForUpdates: boolean = false;
 
         // Handle OnPrem (if necessary)
         if (import.meta.env.BUILD_ENVIRONMENT === 'onprem') {
@@ -1649,41 +1649,18 @@ export class Backend {
                 break;
             case 'custom':
             case 'work': {
-                let productName = 'Threema Work';
-                if (import.meta.env.BUILD_FLAVOR === 'work-onprem') {
-                    productName = 'Threema Work (OnPrem)';
-                }
-                if (import.meta.env.BUILD_FLAVOR === 'custom-onprem') {
-                    productName = import.meta.env.APP_NAME;
-                }
-
-                if (joinResult.workCredentials === undefined) {
-                    return await throwLinkingError(
-                        `This is a ${productName} app, but essential data did not include ${productName} credentials. Ensure that you're using the latest mobile app version.`,
-                        {kind: 'generic-error'},
-                    );
-                }
-                if (joinResult.workCredentials.username === '') {
-                    return await throwLinkingError(
-                        `${productName} credentials username is empty.`,
-                        {
-                            kind: 'invalid-work-credentials',
-                        },
-                    );
-                }
-                if (joinResult.workCredentials.password === '') {
-                    return await throwLinkingError(
-                        `${productName} credentials password is empty.`,
-                        {
-                            kind: 'invalid-work-credentials',
-                        },
-                    );
-                }
+                const productName = import.meta.env.APP_NAME;
+                const effectiveWorkCredentials: ThreemaWorkCredentials =
+                    joinResult.workCredentials ??
+                        workCredentials ?? {
+                            username: '',
+                            password: '',
+                        };
 
                 // In `"work"` builds `workData` must be a store.
                 const unwrappedWorkData = unwrap(workData);
-                // Set `workCredentials` obtained during device join.
-                unwrappedWorkData.set({workCredentials: joinResult.workCredentials});
+                // Set `workCredentials` obtained during device join or OPPF setup.
+                unwrappedWorkData.set({workCredentials: effectiveWorkCredentials});
 
                 phase3Services = {
                     work: new FetchWorkBackend({
@@ -1692,25 +1669,29 @@ export class Backend {
                         systemInfo: backendInit.systemInfo,
                     }),
                 };
-                let licenseStatus;
-                try {
-                    licenseStatus = await phase3Services.work.checkLicense(
-                        // Unwrap is fine here because we check above for undefined
-                        unwrap(unwrappedWorkData.get()).workCredentials,
-                    );
-                } catch (error) {
-                    return await throwLinkingError(
-                        `${productName} credentials could not be validated: ${error}`,
-                        {kind: 'generic-error'},
-                    );
-                }
-                if (licenseStatus.valid) {
-                    log.info(`${productName} credentials are valid`);
-                } else {
-                    return await throwLinkingError(
-                        `${productName} credentials are invalid or revoked: ${licenseStatus.message}`,
-                        {kind: 'invalid-work-credentials'},
-                    );
+                if (
+                    effectiveWorkCredentials.username !== '' ||
+                    effectiveWorkCredentials.password !== ''
+                ) {
+                    let licenseStatus;
+                    try {
+                        licenseStatus = await phase3Services.work.checkLicense(
+                            unwrap(unwrappedWorkData.get()).workCredentials,
+                        );
+                    } catch (error) {
+                        return await throwLinkingError(
+                            `${productName} credentials could not be validated: ${error}`,
+                            {kind: 'generic-error'},
+                        );
+                    }
+                    if (licenseStatus.valid) {
+                        log.info(`${productName} credentials are valid`);
+                    } else {
+                        return await throwLinkingError(
+                            `${productName} credentials are invalid or revoked: ${licenseStatus.message}`,
+                            {kind: 'invalid-work-credentials'},
+                        );
+                    }
                 }
 
                 break;
@@ -2019,13 +2000,7 @@ export class Backend {
         storedOnPremConfig: KeyStorageOnPremConfigStoreData | undefined,
         log: Logger,
     ): Promise<oppf.OppfFile> {
-        if (workCredentials === undefined) {
-            throw new BackendCreationError(
-                'missing-work-credentials',
-                'This is a onprem app, but no work data was found. Requesting the work credentials again.',
-            );
-        }
-        const {password, username} = workCredentials;
+        const {password, username} = workCredentials ?? {username: '', password: ''};
 
         if (storedOnPremConfig?.oppfUrl === undefined) {
             throw new BackendCreationError(

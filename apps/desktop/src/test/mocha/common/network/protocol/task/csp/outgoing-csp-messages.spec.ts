@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {byteWithoutZeroPadding} from '@threema/ts-utils/byte/byte-without-zero-padding';
 import {UTF8} from '@threema/ts-utils/codec/utf8';
 import {Delayed} from '@threema/ts-utils/delayed/delayed';
@@ -992,7 +993,7 @@ export function run(): void {
             it('should send a message to all group members', async function () {
                 const members = [user1, user2];
                 await runSendGroupMessageTest({
-                    name: 'Chüngelizüchter Pfäffikon',
+                    name: 'Chüngelizüchter Zürich',
                     creator: 'self',
                     members,
                     groupId,
@@ -1357,7 +1358,7 @@ export function run(): void {
                         groupId,
                         creator: 'me',
                         createdAt: new Date(),
-                        name: 'Chüngelizüchter Pfäffikon',
+                        name: 'Chüngelizüchter Zürich',
                         userState: GroupUserState.MEMBER,
                         category: ConversationCategory.DEFAULT,
                         visibility: ConversationVisibility.SHOW,
@@ -1452,7 +1453,7 @@ export function run(): void {
                         groupId,
                         creator: 'me',
                         createdAt: new Date(),
-                        name: 'Chüngelizüchter Pfäffikon 🐇',
+                        name: 'Chüngelizüchter Zürich 🐇',
                         userState: GroupUserState.MEMBER,
                         category: ConversationCategory.DEFAULT,
                         visibility: ConversationVisibility.SHOW,
@@ -1466,7 +1467,7 @@ export function run(): void {
                     encoder: structbuf.bridge.encoder(structbuf.csp.e2e.GroupCreatorContainer, {
                         groupId,
                         innerData: structbuf.bridge.encoder(structbuf.csp.e2e.GroupName, {
-                            name: UTF8.encode('Chüngel- und Hoppelhasenzüchter Pfäffikon'),
+                            name: UTF8.encode('Chüngel- und Hoppelhasenzüchter Zürich'),
                         }),
                     }),
                     messageId: randomMessageId(crypto),
@@ -1489,7 +1490,7 @@ export function run(): void {
                                             structbuf.csp.e2e.GroupName,
                                             {
                                                 name: UTF8.encode(
-                                                    'Chüngel- und Hoppelhasenzüchter Pfäffikon',
+                                                    'Chüngel- und Hoppelhasenzüchter Zürich',
                                                 ),
                                             },
                                         ),

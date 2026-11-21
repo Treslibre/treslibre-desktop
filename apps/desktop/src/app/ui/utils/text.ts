@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {markify, TokenType} from '@threema/threema-markup';
 import type {u53} from '@threema/ts-utils/integer/u53';
 import type {WeakOpaque} from '@threema/ts-utils/meta/newtype';
@@ -404,7 +405,7 @@ export function parseLinks(text: SanitizedHtml): SanitizedHtml {
                         schemeMatches: /^[^:/]*https?:\/\//u.test(token),
                     },
                     replaceFn: (match) => {
-                        // Autolinker sometimes matches text starting with a double-slash (e.g. "//threema.ch"),
+                        // Autolinker sometimes matches text starting with a double-slash (e.g. "//example.org"),
                         // which shouldn't be permitted.
                         if (match.type === 'url' && match.getMatchedText().startsWith('//')) {
                             return false;

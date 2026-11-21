@@ -1,3 +1,6 @@
+<!--
+  Modified 2026 by Treslibre Project (Treslibre).
+-->
 <script lang="ts">
   import type {AppServicesForSvelte} from '~/app/types';
   import {unusedProp} from '~/common/utils/svelte-helpers';
@@ -12,9 +15,13 @@
 </script>
 
 <section class="threema">
-  <h2>Jobs</h2>
-  <a href="https://threema.ch/jobs" target="_blank" rel="noreferrer noopener">
-    Join the Threema Team!
+  <h2>Treslibre Project</h2>
+  <a
+    href="https://github.com/Treslibre/treslibre-desktop"
+    target="_blank"
+    rel="noreferrer noopener"
+  >
+    Treslibre Source Repository
   </a>
 </section>
 

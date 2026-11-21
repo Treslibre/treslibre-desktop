@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {expect, type ElectronApplication, type Page} from '@playwright/test';
 
 import {test} from '~/test/playwright/common/fixtures/base';
@@ -26,7 +27,7 @@ test.afterAll(async () => {
  * exchange (`X25519MLKEM768`) when connecting to a server that supports it.
  *
  * This test uses the CDP Network domain to inspect TLS security details for a fetch request to
- * `https://www.threema.com`, which is known to support `X25519MLKEM768`.
+ * `https://www.example.org`, which is known to support `X25519MLKEM768`.
  */
 test('Assert post-quantum TLS key exchange (X25519MLKEM768)', async () => {
     test.setTimeout(30_000);
@@ -38,7 +39,7 @@ test('Assert post-quantum TLS key exchange (X25519MLKEM768)', async () => {
     // - Host is allowed by our CSP in `electron-main.ts`.
     // - Host negotiates `X25519MLKEM768`.
     // - Host is reachable publicly and in CI.
-    const url = 'https://ds-apip.test.threema.ch/';
+    const url = 'https://ds-apip.test.treslibre.invalid/';
 
     // Open a CDP session and enable the Network domain.
     const context = electronApplication.context();

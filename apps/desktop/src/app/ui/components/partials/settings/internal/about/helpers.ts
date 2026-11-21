@@ -1,6 +1,7 @@
+// Modified 2026 by Treslibre Project (Treslibre).
+import {ensureArrayBufferBackedView} from '@threema/ts-utils/byte/array-buffer-backed-view';
 import {ensureError} from '@threema/ts-utils/meta/ensure-error';
 
-import {ROUTE_DEFINITIONS, type RouteInstanceFor} from '~/app/routing/routes';
 import type {AppServicesForSvelte} from '~/app/types';
 import {i18n} from '~/app/ui/i18n';
 import {toast} from '~/app/ui/snackbar';
@@ -12,14 +13,9 @@ import {
     type RtcStatsSessionId,
     type RtcStatsSessionInfo,
 } from '~/common/dom/webrtc/rtcstats/trace-indexeddb';
-import {ReceiverType} from '~/common/enum';
 import {extractErrorMessage} from '~/common/error';
 import type {Logger} from '~/common/logging';
 import {keys} from '~/common/utils/object';
-
-type PreloadedFilesArray = NonNullable<
-    RouteInstanceFor<'main', 'conversation'>['params']['preloadedFiles']
->;
 
 export async function collectLogsAndComposeMessageToSupport(
     services: Pick<AppServicesForSvelte, 'backend' | 'electron' | 'router'>,
@@ -27,56 +23,29 @@ export async function collectLogsAndComposeMessageToSupport(
 ): Promise<void> {
     try {
         const logFiles = await services.electron.getGzippedLogFiles();
-
-        const preloadedFiles: PreloadedFilesArray = keys(logFiles).flatMap((key) => {
+        let exported = 0;
+        for (const key of keys(logFiles)) {
             const bytes = logFiles[key];
             if (bytes === undefined) {
-                return [];
+                continue;
             }
-
-            return [
-                {
-                    bytes,
-                    fileName: `desktop-log-${key}.txt.gz`,
-                    mediaType: 'application/gzip',
-                },
-            ];
-        });
-        if (preloadedFiles.length === 0) {
-            throw new Error('No log files available to send to support');
+            const blob = new Blob([ensureArrayBufferBackedView(bytes)], {
+                type: 'application/gzip',
+            });
+            saveBlobAsFile(blob, `treslibre-desktop-log-${key}.txt.gz`);
+            exported++;
         }
-
-        const supportContact = await services.backend.viewModel
-            .settings()
-            .then(
-                async (viewModelBundle) =>
-                    await viewModelBundle.viewModelController.getOrCreatePredefinedContact(
-                        '*SUPPORT',
-                    ),
-            );
-        services.router.goToConversation(
-            {
-                receiverLookup: {
-                    type: ReceiverType.CONTACT,
-                    uid: supportContact.ctx,
-                },
-                preloadedFiles,
-            },
-            {
-                nav: ROUTE_DEFINITIONS.nav.conversationList.withoutParams(),
-            },
-        );
+        if (exported === 0) {
+            throw new Error('No log files available to export');
+        }
     } catch (error) {
         log.error(
-            `Sending logs to support was unsuccessful: ${extractErrorMessage(
-                ensureError(error),
-                'short',
-            )}`,
+            `Exporting logs was unsuccessful: ${extractErrorMessage(ensureError(error), 'short')}`,
         );
         toast.addSimpleFailure(
             i18n
                 .get()
-                .t('settings--about.error--send-logs-to-support', 'Failed to send log files.'),
+                .t('settings--about.error--send-logs-to-support', 'Failed to export log files.'),
         );
     }
 }

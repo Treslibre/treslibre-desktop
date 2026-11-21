@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {hexToBytes} from '@threema/ts-utils/byte/hex-to-bytes';
 import type {u8} from '@threema/ts-utils/integer/u8';
 
@@ -120,25 +121,25 @@ export type ContactRepository = {
 export const PREDEFINED_NON_SPECIAL_CONTACTS = {
     /* eslint-disable @typescript-eslint/naming-convention */
     '*SUPPORT': {
-        name: 'Threema Support',
+        name: 'Treslibre Support',
         publicKey: ensurePublicKey(
-            hexToBytes('0f944d18324b2132c61d8e40afce60a0ebd701bb11e89be94972d4229e94722a'),
+            hexToBytes('0000000000000000000000000000000000000000000000000000000000000000'),
         ),
-        visibleInContactList: true,
+        visibleInContactList: false as boolean,
     },
     '*THREEMA': {
-        name: 'Threema Channel',
+        name: 'Treslibre Channel',
         publicKey: ensurePublicKey(
-            hexToBytes('3a38650c681435bd1fb8498e213a2919b09388f5803aa44640e0f706326a865c'),
+            hexToBytes('0000000000000000000000000000000000000000000000000000000000000000'),
         ),
-        visibleInContactList: true,
+        visibleInContactList: false as boolean,
     },
     '*MY3DATA': {
-        name: 'My Threema Data',
+        name: 'My Treslibre Data',
         publicKey: ensurePublicKey(
-            hexToBytes('3b01854f24736e2d0d2dc387eaf2c0273c5049052147132369bf3960d0a0bf02'),
+            hexToBytes('0000000000000000000000000000000000000000000000000000000000000000'),
         ),
-        visibleInContactList: true,
+        visibleInContactList: false as boolean,
     },
 } as const;
 
@@ -147,11 +148,11 @@ export const PREDEFINED_NON_SPECIAL_CONTACTS = {
  */
 export const SPECIAL_CONTACTS = {
     '*3MAPUSH': {
-        name: 'Threema Push',
+        name: 'Treslibre Push',
         publicKey: ensurePublicKey(
-            hexToBytes('fd711e1a0db0e2f03fcaab6c43da2575b9513664a62a12bd0728d87f7125cc24'),
+            hexToBytes('0000000000000000000000000000000000000000000000000000000000000000'),
         ),
-        visibleInContactList: false,
+        visibleInContactList: false as boolean,
     },
     /* eslint-enable @typescript-eslint/naming-convention */
 } as const;

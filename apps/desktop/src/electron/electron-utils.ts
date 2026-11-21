@@ -161,10 +161,14 @@ export async function checkOppFile(
     validateSenderFrame(event.senderFrame);
 
     const session = getIsolatedSession('oppf-fetch', log, event.sender);
+    const authHeader: Record<string, string> =
+        username !== '' || password !== ''
+            ? {authorization: `Basic ${u8aToBase64(UTF8.encode(`${username}:${password}`))}`}
+            : {};
     const response = await session.fetch(oppfUrl, {
         method: 'HEAD',
         headers: {
-            'authorization': `Basic ${u8aToBase64(UTF8.encode(`${username}:${password}`))}`,
+            ...authHeader,
             'user-agent': userAgent,
             ...getOnpremAppIdentifierHeader(),
         },
@@ -184,10 +188,14 @@ export async function getOppFile(
     validateSenderFrame(event.senderFrame);
 
     const session = getIsolatedSession('oppf-fetch', log, event.sender);
+    const authHeader: Record<string, string> =
+        username !== '' || password !== ''
+            ? {authorization: `Basic ${u8aToBase64(UTF8.encode(`${username}:${password}`))}`}
+            : {};
     const response = await session.fetch(oppfUrl, {
         method: 'GET',
         headers: {
-            'authorization': `Basic ${u8aToBase64(UTF8.encode(`${username}:${password}`))}`,
+            ...authHeader,
             'accept': 'application/json',
             'user-agent': userAgent,
             ...getOnpremAppIdentifierHeader(),

@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {UTF8} from '@threema/ts-utils/codec/utf8';
 import {dateToUnixTimestampMs} from '@threema/ts-utils/number/date-to-unix-timestamp-ms';
 import {intoUnsignedLong} from '@threema/ts-utils/number/into-unsigned-long';
@@ -95,7 +96,7 @@ export function run(): void {
 
                 // Process incoming reflected message from user1
                 const messageId = randomMessageId(crypto);
-                const text = 'Hello Pfäffikon';
+                const text = 'Hello Zürich';
                 const createdAt = secondsAgo(20);
                 const reflectedAt = secondsAgo(10);
                 const messageEncoder = structbuf.bridge.encoder(structbuf.csp.e2e.Text, {
@@ -137,7 +138,7 @@ export function run(): void {
 
                 // Process incoming reflected message from group
                 const messageId = randomMessageId(crypto);
-                const text = 'Hello Pfäffikon';
+                const text = 'Hello Zürich';
                 const createdAt = secondsAgo(20);
                 const reflectedAt = secondsAgo(10);
                 const messageEncoder = structbuf.bridge.encoder(
@@ -189,7 +190,7 @@ export function run(): void {
 
                 // Process incoming reflected message from user1
                 const messageId = randomMessageId(crypto);
-                const text = 'Hello Pfäffikon';
+                const text = 'Hello Zürich';
                 const createdAt = secondsAgo(20);
                 const reflectedAt = secondsAgo(10);
                 const messageEncoder = structbuf.bridge.encoder(structbuf.csp.e2e.Text, {
@@ -384,7 +385,7 @@ export function run(): void {
                 // Process outgoing reflected message to user
                 const messageId = randomMessageId(crypto);
                 const createdAt = new Date();
-                const text = 'Hello Pfäffikon';
+                const text = 'Hello Zürich';
                 const task = new ReflectedOutgoingMessageTask(
                     services,
                     makeMessage(messageId, createdAt, CspE2eConversationType.TEXT, text, {
@@ -419,7 +420,7 @@ export function run(): void {
                 // Process outgoing reflected message to group
                 const messageId = randomMessageId(crypto);
                 const createdAt = new Date();
-                const text = 'Bonjour Pfäffikon';
+                const text = 'Bonjour Zürich';
                 const task = new ReflectedOutgoingMessageTask(
                     services,
                     makeMessage(
@@ -470,7 +471,7 @@ export function run(): void {
                         messageId,
                         new Date(),
                         CspE2eConversationType.TEXT,
-                        'Buongiorno Pfäffikon',
+                        'Buongiorno Zürich',
                         {
                             id: 'group',
                             contact: undefined,
@@ -506,7 +507,7 @@ export function run(): void {
                         messageId,
                         new Date(),
                         CspE2eGroupConversationType.GROUP_TEXT,
-                        'Buongiorno Pfäffikon',
+                        'Buongiorno Zürich',
                         {
                             id: 'contact',
                             contact: user1.identity.string,
@@ -540,7 +541,7 @@ export function run(): void {
                         new Date(),
                         // Type: Contact
                         CspE2eConversationType.TEXT,
-                        'Buongiorno Pfäffikon',
+                        'Buongiorno Zürich',
                         // Protobuf: Group
                         {
                             id: 'group',
@@ -580,7 +581,7 @@ export function run(): void {
                         new Date(),
                         // Type: Group
                         CspE2eGroupConversationType.GROUP_TEXT,
-                        'Buongiorno Pfäffikon',
+                        'Buongiorno Zürich',
                         // Protobuf: Contact
                         {
                             id: 'contact',
@@ -626,7 +627,7 @@ export function run(): void {
                         messageId,
                         new Date(),
                         CspE2eGroupConversationType.GROUP_TEXT,
-                        'Buongiorno Pfäffikon',
+                        'Buongiorno Zürich',
                         // Protobuf: Group 1
                         {
                             id: 'group',
@@ -663,7 +664,7 @@ export function run(): void {
                 // Process outgoing reflected message to user
                 const messageId = randomMessageId(crypto);
                 const createdAt = new Date();
-                const text = 'Hello Pfäffikon';
+                const text = 'Hello Zürich';
                 const task = new ReflectedOutgoingMessageTask(
                     services,
                     makeMessage(messageId, createdAt, CspE2eConversationType.TEXT, text, {
@@ -740,7 +741,7 @@ export function run(): void {
                 // Process outgoing reflected message to user
                 const messageId = randomMessageId(crypto);
                 const createdAt = new Date();
-                const text = 'Hello Pfäffikon';
+                const text = 'Hello Zürich';
                 const task = new ReflectedOutgoingMessageTask(
                     services,
                     makeMessage(messageId, createdAt, CspE2eConversationType.TEXT, text, {

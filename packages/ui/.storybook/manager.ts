@@ -1,11 +1,11 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {addons} from 'storybook/manager-api';
 import {create} from 'storybook/theming';
 
 const theme = create({
     base: 'light',
-    brandTitle: 'Threema UI',
-    brandUrl: 'https://threema.com',
-    brandImage: 'https://threema.com/assets/company/logo/dark/threema_logo_bw.svg',
+    brandTitle: 'Treslibre UI',
+    brandUrl: 'https://github.com/Treslibre/treslibre-desktop',
     brandTarget: '_self',
 });
 

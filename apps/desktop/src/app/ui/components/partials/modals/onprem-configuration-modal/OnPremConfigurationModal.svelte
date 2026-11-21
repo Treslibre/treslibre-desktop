@@ -2,7 +2,6 @@
   import {onDestroy, onMount} from 'svelte';
 
   import {globals} from '~/app/globals';
-  import SubstitutableText from '~/app/ui/SubstitutableText.svelte';
   import Input from '~/app/ui/components/atoms/input/Input.svelte';
   import Text from '~/app/ui/components/atoms/text/Text.svelte';
   import {checkAndCompleteUrl} from '~/app/ui/components/partials/modals/onprem-configuration-modal/helpers';
@@ -18,11 +17,9 @@
 
   const {oppfConfig, services}: OnPremConfigurationModalProps = $props();
 
-  const downloadAndInfoForOtherVariantUrl = import.meta.env.URLS.downloadAndInfoForOtherVariant;
-
   let oppfUrlInputComponent = $state<Input>();
 
-  let oppfUrl = $state<string>(import.meta.env.URLS.presetOppfUrl?.full ?? 'https://');
+  let oppfUrl = $state<string>(import.meta.env.URLS.presetOppfUrl?.full ?? '');
   let password = $state<string>('');
   let username = $state<string>('');
 
@@ -146,29 +143,6 @@
         )}
       />
     </div>
-    {#if import.meta.env.BUILD_VARIANT !== 'custom' && downloadAndInfoForOtherVariantUrl !== 'hidden'}
-      <div class="info">
-        <SubstitutableText
-          text={$i18n.t(
-            'dialog--linking-oppf.prose--private-user',
-            'If you are a private user, please visit <slot_1 /> to download {shortAppName}.',
-            {
-              shortAppName: import.meta.env.SHORT_APP_NAME,
-            },
-          )}
-        >
-          {#snippet slot_1()}
-            <a
-              href={downloadAndInfoForOtherVariantUrl.full}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              {downloadAndInfoForOtherVariantUrl.short}
-            </a>
-          {/snippet}
-        </SubstitutableText>
-      </div>
-    {/if}
   </div>
   <div class="footer">
     <Button flavor="filled" onclick={handleClickConfirm}>
@@ -208,11 +182,6 @@
     gap: rem(8px);
 
     color: var(--t-text-e2-color);
-
-    a {
-      text-decoration: underline;
-      color: inherit;
-    }
 
     .info {
       margin-top: rem(12px);

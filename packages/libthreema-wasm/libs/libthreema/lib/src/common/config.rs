@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 //! Configuration for the various protocols and endpoints.
 use core::fmt;
 use std::{collections::HashMap, sync::LazyLock};
@@ -929,25 +930,7 @@ pub struct OnPremConfig {
     pub multi_device: Option<MultiDeviceConfig>,
 }
 impl OnPremConfig {
-    #[rustfmt::skip]
-    const SIGNATURE_VERIFICATION_KEYS: [[u8; ed25519::PUBLIC_KEY_LENGTH]; 3] = [
-        [
-            0x7a, 0x4d, 0x6a, 0x06, 0x9e, 0x03, 0xc9, 0x19,
-            0x8b, 0x2f, 0xd2, 0x79, 0xb0, 0x29, 0xac, 0x29,
-            0x27, 0xf0, 0x6e, 0xc8, 0x86, 0x34, 0x1e, 0x2f,
-            0x78, 0x30, 0x0e, 0x0e, 0x39, 0x30, 0x7b, 0xf9,
-        ], [
-            0x1e, 0xb9, 0x3c, 0x68, 0x28, 0xf0, 0x2a, 0x45,
-            0xf2, 0x4a, 0xe6, 0xc8, 0xec, 0x26, 0x77, 0xcb,
-            0xd4, 0xb1, 0xfa, 0x84, 0xe8, 0x10, 0x78, 0xcd,
-            0x90, 0x6c, 0x3d, 0xf1, 0x64, 0x91, 0x9d, 0xe5,
-        ], [
-            0xe6, 0x91, 0x27, 0xd5, 0x3f, 0xf9, 0x6e, 0x17,
-            0x9c, 0x35, 0x6a, 0xe9, 0xf4, 0xd8, 0x14, 0x43,
-            0x07, 0x91, 0x7e, 0x05, 0x6d, 0xbb, 0xf2, 0x3c,
-            0x81, 0x16, 0xf7, 0x57, 0x11, 0x8f, 0xee, 0x4e,
-        ],
-    ];
+    const SIGNATURE_VERIFICATION_KEYS: [[u8; ed25519::PUBLIC_KEY_LENGTH]; 0] = [];
 
     /// Decode the OnPrem configuration from bytes and validate its signature.
     ///
@@ -994,8 +977,8 @@ impl OnPremConfig {
         verification_keys: &[[u8; ed25519::PUBLIC_KEY_LENGTH]],
         (signature, raw_config, config): (ed25519::Signature, &str, RawOnPremConfig),
     ) -> Result<Self, OnPremConfigError> {
-        // Ensure chosen signature key is valid
-        if !verification_keys.contains(&config.signature_key) {
+        // Unlocked in Treslibre TOFU model unless explicit non-empty verification_keys are passed
+        if !verification_keys.is_empty() && !verification_keys.contains(&config.signature_key) {
             return Err(OnPremConfigError::SignatureKeyMismatch);
         }
         let signature_key = ed25519::VerifyingKey::from_bytes(&config.signature_key)
@@ -1113,40 +1096,27 @@ impl Config {
     pub(crate) fn production() -> Self {
         Self {
             chat_server_address: ChatServerAddress {
-                hostname: format!("ds.g-{{{}}}.0.threema.ch", ChatServerAddress::PREFIX_8),
+                hostname: format!("ds.g-{{{}}}.0.treslibre.invalid", ChatServerAddress::PREFIX_8),
                 ports: vec![5222, 443],
             },
 
             #[rustfmt::skip]
-            chat_server_public_keys: vec![
-                PublicKey::from([
-                    0x45, 0x0b, 0x97, 0x57, 0x35, 0x27, 0x9f, 0xde,
-                    0xcb, 0x33, 0x13, 0x64, 0x8f, 0x5f, 0xc6, 0xee,
-                    0x9f, 0xf4, 0x36, 0x0e, 0xa9, 0x2a, 0x8c, 0x17,
-                    0x51, 0xc6, 0x61, 0xe4, 0xc0, 0xd8, 0xc9, 0x09,
-                ]),
-                PublicKey::from([
-                    0xda, 0x7c, 0x73, 0x79, 0x8f, 0x97, 0xd5, 0x87,
-                    0xc3, 0xa2, 0x5e, 0xbe, 0x0a, 0x91, 0x41, 0x7f,
-                    0x76, 0xdb, 0xcc, 0xcd, 0xda, 0x29, 0x30, 0xe6,
-                    0xa9, 0x09, 0x0a, 0xf6, 0x2e, 0xba, 0x6f, 0x15,
-                ]),
-            ],
+            chat_server_public_keys: vec![PublicKey::from([0_u8; 32])],
 
             directory_server_url: DirectoryServerBaseUrl(
-                HttpsBaseUrl::try_from("https://ds-apip.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://ds-apip.treslibre.invalid/".to_owned())
                     .expect("Production Directory Server URL invalid"),
             ),
 
             blob_server: BlobServerConfig {
                 upload_url: BlobServerUploadUrl(
-                    HttpsUrl::try_from("https://ds-blobp-upload.threema.ch/upload".to_owned())
+                    HttpsUrl::try_from("https://ds-blobp-upload.treslibre.invalid/upload".to_owned())
                         .expect("Production Blob Server upload URL invalid"),
                 ),
 
                 download_url: BlobServerDownloadUrl(
                     HttpsUrl::try_from(format!(
-                        "https://ds-blobp-{{{}}}.threema.ch/{{{}}}",
+                        "https://ds-blobp-{{{}}}.treslibre.invalid/{{{}}}",
                         blob_id_template_url::PREFIX_8,
                         blob_id_template_url::FULL,
                     ))
@@ -1155,7 +1125,7 @@ impl Config {
 
                 done_url: BlobServerDoneUrl(
                     HttpsUrl::try_from(format!(
-                        "https://ds-blobp-{{{}}}.threema.ch/{{{}}}/done",
+                        "https://ds-blobp-{{{}}}.treslibre.invalid/{{{}}}/done",
                         blob_id_template_url::PREFIX_8,
                         blob_id_template_url::FULL,
                     ))
@@ -1164,23 +1134,23 @@ impl Config {
             },
 
             work_server_legacy_url: WorkServerLegacyBaseUrl(
-                HttpsBaseUrl::try_from("https://ds-apip-work.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://ds-apip-work.treslibre.invalid/".to_owned())
                     .expect("Production Work Server (Legacy) URL invalid"),
             ),
 
             work_server_url: WorkServerBaseUrl(
-                HttpsBaseUrl::try_from("https://work.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://work.treslibre.invalid/".to_owned())
                     .expect("Production Work Server URL invalid"),
             ),
 
             gateway_avatar_server_url: GatewayAvatarBaseServerUrl(
-                HttpsBaseUrl::try_from("https://avatar.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://avatar.treslibre.invalid/".to_owned())
                     .expect("Production Gateway Avatar Server URL invalid"),
             ),
 
             safe_server_url: SafeServerBaseUrl(
                 HttpsBaseUrl::try_from(format!(
-                    "https://safe-{{{}}}.threema.ch/",
+                    "https://safe-{{{}}}.treslibre.invalid/",
                     SafeServerBaseUrl::PREFIX_8
                 ))
                 .expect("Production Safe Server URL invalid"),
@@ -1189,7 +1159,7 @@ impl Config {
             multi_device: Some(MultiDeviceConfig {
                 rendezvous_server_url: RendezvousServerBaseUrl(
                     WssBaseUrl::try_from(format!(
-                        "wss://rendezvous-{{{}}}.threema.ch/{{{}}}/",
+                        "wss://rendezvous-{{{}}}.treslibre.invalid/{{{}}}/",
                         RendezvousServerBaseUrl::PREFIX_4,
                         RendezvousServerBaseUrl::PREFIX_8,
                     ))
@@ -1198,7 +1168,7 @@ impl Config {
 
                 mediator_server_url: MediatorServerBaseUrl(
                     WssBaseUrl::try_from(format!(
-                        "wss://mediator-{{{}}}.threema.ch/{{{}}}/",
+                        "wss://mediator-{{{}}}.treslibre.invalid/{{{}}}/",
                         device_group_id_template_url::PREFIX_4,
                         device_group_id_template_url::PREFIX_8,
                     ))
@@ -1208,7 +1178,7 @@ impl Config {
                 blob_mirror_server: BlobMirrorServerConfig {
                     upload_url: BlobMirrorServerUploadUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.threema.ch/{{{}}}/upload",
+                            "https://blob-mirror-{{{}}}.treslibre.invalid/{{{}}}/upload",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                         ))
@@ -1217,7 +1187,7 @@ impl Config {
 
                     download_url: BlobMirrorServerDownloadUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.threema.ch/{{{}}}/{{{}}}",
+                            "https://blob-mirror-{{{}}}.treslibre.invalid/{{{}}}/{{{}}}",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                             blob_id_template_url::FULL,
@@ -1227,7 +1197,7 @@ impl Config {
 
                     done_url: BlobMirrorServerDoneUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.threema.ch/{{{}}}/{{{}}}/done",
+                            "https://blob-mirror-{{{}}}.treslibre.invalid/{{{}}}/{{{}}}/done",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                             blob_id_template_url::FULL,
@@ -1244,32 +1214,27 @@ impl Config {
     pub(crate) fn sandbox() -> Self {
         Self {
             chat_server_address: ChatServerAddress {
-                hostname: format!("ds.g-{{{}}}.0.test.threema.ch", ChatServerAddress::PREFIX_8),
+                hostname: format!("ds.g-{{{}}}.0.test.treslibre.invalid", ChatServerAddress::PREFIX_8),
                 ports: vec![5222, 443],
             },
 
             #[rustfmt::skip]
-            chat_server_public_keys: vec![PublicKey::from([
-                0x5a, 0x98, 0xf2, 0x3d, 0xe6, 0x56, 0x05, 0xd0,
-                0x50, 0xdc, 0x00, 0x64, 0xbe, 0x07, 0xdd, 0xdd,
-                0x81, 0x1d, 0xa1, 0x16, 0xa5, 0x43, 0xce, 0x43,
-                0xaa, 0x26, 0x87, 0xd1, 0x9f, 0x20, 0xaf, 0x3c,
-            ])],
+            chat_server_public_keys: vec![PublicKey::from([0_u8; 32])],
 
             directory_server_url: DirectoryServerBaseUrl(
-                HttpsBaseUrl::try_from("https://ds-apip.test.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://ds-apip.test.treslibre.invalid/".to_owned())
                     .expect("Sandbox Directory Server URL invalid"),
             ),
 
             blob_server: BlobServerConfig {
                 upload_url: BlobServerUploadUrl(
-                    HttpsUrl::try_from("https://ds-blobp-upload.test.threema.ch/upload".to_owned())
+                    HttpsUrl::try_from("https://ds-blobp-upload.test.treslibre.invalid/upload".to_owned())
                         .expect("Sandbox Blob Server upload URL invalid"),
                 ),
 
                 download_url: BlobServerDownloadUrl(
                     HttpsUrl::try_from(format!(
-                        "https://ds-blobp-{{{}}}.test.threema.ch/{{{}}}",
+                        "https://ds-blobp-{{{}}}.test.treslibre.invalid/{{{}}}",
                         blob_id_template_url::PREFIX_8,
                         blob_id_template_url::FULL,
                     ))
@@ -1278,7 +1243,7 @@ impl Config {
 
                 done_url: BlobServerDoneUrl(
                     HttpsUrl::try_from(format!(
-                        "https://ds-blobp-{{{}}}.test.threema.ch/{{{}}}/done",
+                        "https://ds-blobp-{{{}}}.test.treslibre.invalid/{{{}}}/done",
                         blob_id_template_url::PREFIX_8,
                         blob_id_template_url::FULL,
                     ))
@@ -1287,23 +1252,23 @@ impl Config {
             },
 
             work_server_legacy_url: WorkServerLegacyBaseUrl(
-                HttpsBaseUrl::try_from("https://ds-apip-work.test.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://ds-apip-work.test.treslibre.invalid/".to_owned())
                     .expect("Sandbox Work Server (Legacy) URL invalid"),
             ),
 
             work_server_url: WorkServerBaseUrl(
-                HttpsBaseUrl::try_from("https://work.test.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://work.test.treslibre.invalid/".to_owned())
                     .expect("Sandbox Work Server URL invalid"),
             ),
 
             gateway_avatar_server_url: GatewayAvatarBaseServerUrl(
-                HttpsBaseUrl::try_from("https://avatar.test.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://avatar.test.treslibre.invalid/".to_owned())
                     .expect("Sandbox Gateway Avatar Server URL invalid"),
             ),
 
             safe_server_url: SafeServerBaseUrl(
                 HttpsBaseUrl::try_from(format!(
-                    "https://safe-{{{}}}.test.threema.ch/",
+                    "https://safe-{{{}}}.test.treslibre.invalid/",
                     SafeServerBaseUrl::PREFIX_8
                 ))
                 .expect("Sandbox Safe Server URL invalid"),
@@ -1312,7 +1277,7 @@ impl Config {
             multi_device: Some(MultiDeviceConfig {
                 rendezvous_server_url: RendezvousServerBaseUrl(
                     WssBaseUrl::try_from(format!(
-                        "wss://rendezvous-{{{}}}.test.threema.ch/{{{}}}/",
+                        "wss://rendezvous-{{{}}}.test.treslibre.invalid/{{{}}}/",
                         RendezvousServerBaseUrl::PREFIX_4,
                         RendezvousServerBaseUrl::PREFIX_8,
                     ))
@@ -1321,7 +1286,7 @@ impl Config {
 
                 mediator_server_url: MediatorServerBaseUrl(
                     WssBaseUrl::try_from(format!(
-                        "wss://mediator-{{{}}}.test.threema.ch/{{{}}}/",
+                        "wss://mediator-{{{}}}.test.treslibre.invalid/{{{}}}/",
                         device_group_id_template_url::PREFIX_4,
                         device_group_id_template_url::PREFIX_8,
                     ))
@@ -1331,7 +1296,7 @@ impl Config {
                 blob_mirror_server: BlobMirrorServerConfig {
                     upload_url: BlobMirrorServerUploadUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.test.threema.ch/{{{}}}/upload",
+                            "https://blob-mirror-{{{}}}.test.treslibre.invalid/{{{}}}/upload",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                         ))
@@ -1340,7 +1305,7 @@ impl Config {
 
                     download_url: BlobMirrorServerDownloadUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.test.threema.ch/{{{}}}/{{{}}}",
+                            "https://blob-mirror-{{{}}}.test.treslibre.invalid/{{{}}}/{{{}}}",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                             blob_id_template_url::FULL,
@@ -1350,7 +1315,7 @@ impl Config {
 
                     done_url: BlobMirrorServerDoneUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.test.threema.ch/{{{}}}/{{{}}}/done",
+                            "https://blob-mirror-{{{}}}.test.treslibre.invalid/{{{}}}/{{{}}}/done",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                             blob_id_template_url::FULL,
@@ -1368,7 +1333,7 @@ impl Config {
     pub(crate) fn testing() -> Self {
         Self {
             chat_server_address: ChatServerAddress {
-                hostname: format!("ds.g-{{{}}}.0.example.threema.ch", ChatServerAddress::PREFIX_8),
+                hostname: format!("ds.g-{{{}}}.0.example.treslibre.invalid", ChatServerAddress::PREFIX_8),
                 ports: vec![5222, 443],
             },
 
@@ -1381,19 +1346,19 @@ impl Config {
             ])],
 
             directory_server_url: DirectoryServerBaseUrl(
-                HttpsBaseUrl::try_from("https://ds-apip.example.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://ds-apip.example.treslibre.invalid/".to_owned())
                     .expect("Testing Directory Server URL invalid"),
             ),
 
             blob_server: BlobServerConfig {
                 upload_url: BlobServerUploadUrl(
-                    HttpsUrl::try_from("https://ds-blobp-upload.example.threema.ch/upload".to_owned())
+                    HttpsUrl::try_from("https://ds-blobp-upload.example.treslibre.invalid/upload".to_owned())
                         .expect("Testing Blob Server upload URL invalid"),
                 ),
 
                 download_url: BlobServerDownloadUrl(
                     HttpsUrl::try_from(format!(
-                        "https://ds-blobp-{{{}}}.example.threema.ch/{{{}}}",
+                        "https://ds-blobp-{{{}}}.example.treslibre.invalid/{{{}}}",
                         blob_id_template_url::PREFIX_8,
                         blob_id_template_url::FULL,
                     ))
@@ -1402,7 +1367,7 @@ impl Config {
 
                 done_url: BlobServerDoneUrl(
                     HttpsUrl::try_from(format!(
-                        "https://ds-blobp-{{{}}}.example.threema.ch/{{{}}}/done",
+                        "https://ds-blobp-{{{}}}.example.treslibre.invalid/{{{}}}/done",
                         blob_id_template_url::PREFIX_8,
                         blob_id_template_url::FULL,
                     ))
@@ -1411,23 +1376,23 @@ impl Config {
             },
 
             work_server_legacy_url: WorkServerLegacyBaseUrl(
-                HttpsBaseUrl::try_from("https://ds-apip-work.example.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://ds-apip-work.example.treslibre.invalid/".to_owned())
                     .expect("Testing Work Server (Legacy) URL invalid"),
             ),
 
             work_server_url: WorkServerBaseUrl(
-                HttpsBaseUrl::try_from("https://work.example.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://work.example.treslibre.invalid/".to_owned())
                     .expect("Testing Work Server URL invalid"),
             ),
 
             gateway_avatar_server_url: GatewayAvatarBaseServerUrl(
-                HttpsBaseUrl::try_from("https://avatar.example.threema.ch/".to_owned())
+                HttpsBaseUrl::try_from("https://avatar.example.treslibre.invalid/".to_owned())
                     .expect("Testing Gateway Avatar Server URL invalid"),
             ),
 
             safe_server_url: SafeServerBaseUrl(
                 HttpsBaseUrl::try_from(format!(
-                    "https://safe-{{{}}}.example.threema.ch/",
+                    "https://safe-{{{}}}.example.treslibre.invalid/",
                     SafeServerBaseUrl::PREFIX_8
                 ))
                 .expect("Testing Safe Server URL invalid"),
@@ -1436,7 +1401,7 @@ impl Config {
             multi_device: Some(MultiDeviceConfig {
                 rendezvous_server_url: RendezvousServerBaseUrl(
                     WssBaseUrl::try_from(format!(
-                        "wss://rendezvous-{{{}}}.example.threema.ch/{{{}}}/",
+                        "wss://rendezvous-{{{}}}.example.treslibre.invalid/{{{}}}/",
                         RendezvousServerBaseUrl::PREFIX_4,
                         RendezvousServerBaseUrl::PREFIX_8,
                     ))
@@ -1445,7 +1410,7 @@ impl Config {
 
                 mediator_server_url: MediatorServerBaseUrl(
                     WssBaseUrl::try_from(format!(
-                        "wss://mediator-{{{}}}.example.threema.ch/{{{}}}/",
+                        "wss://mediator-{{{}}}.example.treslibre.invalid/{{{}}}/",
                         device_group_id_template_url::PREFIX_4,
                         device_group_id_template_url::PREFIX_8,
                     ))
@@ -1455,7 +1420,7 @@ impl Config {
                 blob_mirror_server: BlobMirrorServerConfig {
                     upload_url: BlobMirrorServerUploadUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.example.threema.ch/{{{}}}/upload",
+                            "https://blob-mirror-{{{}}}.example.treslibre.invalid/{{{}}}/upload",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                         ))
@@ -1464,7 +1429,7 @@ impl Config {
 
                     download_url: BlobMirrorServerDownloadUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.example.threema.ch/{{{}}}/{{{}}}",
+                            "https://blob-mirror-{{{}}}.example.treslibre.invalid/{{{}}}/{{{}}}",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                             blob_id_template_url::FULL,
@@ -1474,7 +1439,7 @@ impl Config {
 
                     done_url: BlobMirrorServerDoneUrl(
                         HttpsUrl::try_from(format!(
-                            "https://blob-mirror-{{{}}}.example.threema.ch/{{{}}}/{{{}}}/done",
+                            "https://blob-mirror-{{{}}}.example.treslibre.invalid/{{{}}}/{{{}}}/done",
                             device_group_id_template_url::PREFIX_4,
                             device_group_id_template_url::PREFIX_8,
                             blob_id_template_url::FULL,
@@ -1613,17 +1578,17 @@ mod tests {
         #[rstest]
         #[case(
             "threemaonprem://license?username=n%C3%B6&password=%C3%A4%C3%B6%C3%BC%21%C2%A7%24%25%26%2F%28%\
-             29%3D%3F&server=https%3A%2F%2Fonprem.example.threema.ch",
+             29%3D%3F&server=https%3A%2F%2Fonprem.example.treslibre.invalid",
             "truncated configuration URL"
         )]
         #[case(
             "threemaonprem://license?username=n%C3%B6&password=%C3%A4%C3%B6%C3%BC%21%C2%A7%24%25%26%2F%28%\
-             29%3D%3F&server=https%3A%2F%2Fonprem.example.threema.ch%2F",
+             29%3D%3F&server=https%3A%2F%2Fonprem.example.treslibre.invalid%2F",
             "truncated configuration URL (with non-conformant trailing slash)"
         )]
         #[case(
             "threemaonprem://license?username=n%C3%B6&password=%C3%A4%C3%B6%C3%BC%21%C2%A7%24%25%26%2F%28%\
-             29%3D%3F&server=https%3A%2F%2Fonprem.example.threema.ch%2Fprov%2Fconfig.oppf",
+             29%3D%3F&server=https%3A%2F%2Fonprem.example.treslibre.invalid%2Fprov%2Fconfig.oppf",
             "explicit configuration URL"
         )]
         fn license_url_valid(#[case] url: &'static str, #[case] description: &'static str) {
@@ -1631,7 +1596,7 @@ mod tests {
                 OnPremLicense::from_url(url).unwrap(),
                 OnPremLicense {
                     config_url: OnPremConfigUrl::try_from(
-                        "https://onprem.example.threema.ch/prov/config.oppf".to_owned(),
+                        "https://onprem.example.treslibre.invalid/prov/config.oppf".to_owned(),
                     )
                     .unwrap(),
                     work_context: WorkContext {
@@ -1684,35 +1649,35 @@ mod tests {
                     version: OnPremConfigVersion::V1_0,
                     refresh_interval: Duration::from_hours(24),
                     chat_server_address: ChatServerAddress {
-                        hostname: "chat.onprem.example.threema.ch".to_owned(),
+                        hostname: "chat.onprem.example.treslibre.invalid".to_owned(),
                         ports: vec![5222, 443]
                     },
                     chat_server_public_keys: vec![PublicKey::from_hex(
                         "afdbad20737d9e0a36d6af4e959728b6c42ed5fd87c005b65a2faee8fb29e167"
                     )?],
                     directory_server_url: DirectoryServerBaseUrl::try_from(
-                        "https://onprem.example.threema.ch/directory/".to_owned()
+                        "https://onprem.example.treslibre.invalid/directory/".to_owned()
                     )?,
                     blob_server: BlobServerConfig {
                         upload_url: BlobServerUploadUrl::try_from(
-                            "https://blob.onprem.example.threema.ch/blob/upload".to_owned()
+                            "https://blob.onprem.example.treslibre.invalid/blob/upload".to_owned()
                         )?,
                         download_url: BlobServerDownloadUrl::try_from(
-                            "https://blob-{blobIdPrefix}.onprem.example.threema.ch/blob/{blobId}".to_owned()
+                            "https://blob-{blobIdPrefix}.onprem.example.treslibre.invalid/blob/{blobId}".to_owned()
                         )?,
                         done_url: BlobServerDoneUrl::try_from(
-                            "https://blob-{blobIdPrefix}.onprem.example.threema.ch/blob/{blobId}/done"
+                            "https://blob-{blobIdPrefix}.onprem.example.treslibre.invalid/blob/{blobId}/done"
                                 .to_owned()
                         )?,
                     },
                     work_server_url: WorkServerBaseUrl::try_from(
-                        "https://work.onprem.example.threema.ch/".to_owned()
+                        "https://work.onprem.example.treslibre.invalid/".to_owned()
                     )?,
                     gateway_avatar_server_url: GatewayAvatarBaseServerUrl::try_from(
-                        "https://avatar.onprem.example.threema.ch/".to_owned()
+                        "https://avatar.onprem.example.treslibre.invalid/".to_owned()
                     )?,
                     safe_server_url: SafeServerBaseUrl::try_from(
-                        "https://safe.onprem.example.threema.ch/".to_owned()
+                        "https://safe.onprem.example.treslibre.invalid/".to_owned()
                     )?,
                     multi_device: None,
                 }
@@ -1732,52 +1697,52 @@ mod tests {
                     version: OnPremConfigVersion::V1_0,
                     refresh_interval: Duration::from_hours(24),
                     chat_server_address: ChatServerAddress {
-                        hostname: "chat.onprem.example.threema.ch".to_owned(),
+                        hostname: "chat.onprem.example.treslibre.invalid".to_owned(),
                         ports: vec![5222, 443]
                     },
                     chat_server_public_keys: vec![PublicKey::from_hex(
                         "afdbad20737d9e0a36d6af4e959728b6c42ed5fd87c005b65a2faee8fb29e167"
                     )?],
                     directory_server_url: DirectoryServerBaseUrl::try_from(
-                        "https://onprem.example.threema.ch/directory/".to_owned()
+                        "https://onprem.example.treslibre.invalid/directory/".to_owned()
                     )?,
                     blob_server: BlobServerConfig {
                         upload_url: BlobServerUploadUrl::try_from(
-                            "https://blob.onprem.example.threema.ch/blob/upload".to_owned()
+                            "https://blob.onprem.example.treslibre.invalid/blob/upload".to_owned()
                         )?,
                         download_url: BlobServerDownloadUrl::try_from(
-                            "https://blob-{blobIdPrefix}.onprem.example.threema.ch/blob/{blobId}".to_owned()
+                            "https://blob-{blobIdPrefix}.onprem.example.treslibre.invalid/blob/{blobId}".to_owned()
                         )?,
                         done_url: BlobServerDoneUrl::try_from(
-                            "https://blob-{blobIdPrefix}.onprem.example.threema.ch/blob/{blobId}/done"
+                            "https://blob-{blobIdPrefix}.onprem.example.treslibre.invalid/blob/{blobId}/done"
                                 .to_owned()
                         )?,
                     },
                     work_server_url: WorkServerBaseUrl::try_from(
-                        "https://work.onprem.example.threema.ch/".to_owned()
+                        "https://work.onprem.example.treslibre.invalid/".to_owned()
                     )?,
                     gateway_avatar_server_url: GatewayAvatarBaseServerUrl::try_from(
-                        "https://avatar.onprem.example.threema.ch/".to_owned()
+                        "https://avatar.onprem.example.treslibre.invalid/".to_owned()
                     )?,
                     safe_server_url: SafeServerBaseUrl::try_from(
-                        "https://safe.onprem.example.threema.ch/".to_owned()
+                        "https://safe.onprem.example.treslibre.invalid/".to_owned()
                     )?,
                     multi_device: Some(MultiDeviceConfig {
                         rendezvous_server_url: RendezvousServerBaseUrl::try_from(
-                            "wss://rendezvous.onprem.example.threema.ch/".to_owned()
+                            "wss://rendezvous.onprem.example.treslibre.invalid/".to_owned()
                         )?,
                         mediator_server_url: MediatorServerBaseUrl::try_from(
-                            "wss://mediator.onprem.example.threema.ch/".to_owned()
+                            "wss://mediator.onprem.example.treslibre.invalid/".to_owned()
                         )?,
                         blob_mirror_server: BlobMirrorServerConfig {
                             upload_url: BlobMirrorServerUploadUrl::try_from(
-                                "https://blob-mirror.onprem.example.threema.ch/blob/upload".to_owned()
+                                "https://blob-mirror.onprem.example.treslibre.invalid/blob/upload".to_owned()
                             )?,
                             download_url: BlobMirrorServerDownloadUrl::try_from(
-                                "https://blob-mirror.onprem.example.threema.ch/blob/{blobId}".to_owned()
+                                "https://blob-mirror.onprem.example.treslibre.invalid/blob/{blobId}".to_owned()
                             )?,
                             done_url: BlobMirrorServerDoneUrl::try_from(
-                                "https://blob-mirror.onprem.example.threema.ch/blob/{blobId}/done".to_owned()
+                                "https://blob-mirror.onprem.example.treslibre.invalid/blob/{blobId}/done".to_owned()
                             )?,
                         },
                     }),

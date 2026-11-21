@@ -299,7 +299,7 @@ function signWindowsBinaryOrPackage(
         'Missing WIN_SIGN_TOKEN_PASSWORD env var',
     );
     const description = determineAppName(flavor, appName);
-    const url = 'https://threema.ch/';
+    const url = 'https://github.com/Treslibre/treslibre-desktop';
     const fileDigest = 'sha512';
     const timestampDigest = 'sha512';
     const timestampUrl = 'http://timestamp.sectigo.com';

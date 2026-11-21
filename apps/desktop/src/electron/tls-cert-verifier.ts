@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {createHash, X509Certificate} from 'node:crypto';
 
 import {byteEquals} from '@threema/ts-utils/byte/byte-equals';
@@ -223,7 +224,7 @@ export function createTlsCertificateVerifier(
             // - The host is one of our own servers and the pins we hold are stale (or the
             //   connection is being intercepted).
             // - The host merely *matches* a pin's FQDN pattern but is not a server the app ever
-            //   talks to. `abc.threema.ch`, for example, matches `*.threema.ch`.
+            //   talks to. `abc.example.org`, for example, matches `*.example.org`.
             //
             // Rejecting the certificate further below is the correct and complete response in both
             // cases. However, we should only trigger the invalid pins fallback flow in OnPrem

@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import {UTF8} from '@threema/ts-utils/codec/utf8';
 import {Delayed} from '@threema/ts-utils/delayed/delayed';
 import {expect} from 'chai';
@@ -226,7 +227,7 @@ export function groupLeaveTests(
         addTestGroup(model, {
             groupId,
             creator: 'me',
-            name: 'Chüngelizüchter Pfäffikon',
+            name: 'Chüngelizüchter Zürich',
             userState: GroupUserState.MEMBER,
             members: [memberContact],
         });

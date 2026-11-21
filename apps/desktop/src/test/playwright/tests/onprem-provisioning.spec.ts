@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 // Make playwright aware of the window functions we expose.
 declare global {
     interface Window {
@@ -181,7 +182,7 @@ test('Start with DualLock enabled, fail when invalid SPKIs are updated, and reco
                             algorithm: 'sha256',
                         },
                     ],
-                    fqdn: 'devon.3ma.ch',
+                    fqdn: 'devon.treslibre.invalid',
                     matchMode: 'exact',
                 },
             ]);
@@ -276,7 +277,7 @@ test('Fail when invalid public key pins are updated', async ({electronApp}) => {
                             algorithm: 'sha256',
                         },
                     ],
-                    fqdn: 'devon.3ma.ch',
+                    fqdn: 'devon.treslibre.invalid',
                     matchMode: 'exact',
                 },
             ]),

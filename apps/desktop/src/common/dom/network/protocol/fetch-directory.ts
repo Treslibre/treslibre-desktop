@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import * as v from '@badrap/valita';
 import {blake2bHash} from '@threema/crypto';
 import type {ReadonlyUint8Array} from '@threema/ts-utils/array/readonly-uint8-array';
@@ -30,7 +31,7 @@ import {
 } from '~/common/network/protocol/directory';
 import type {IdentityString} from '~/common/network/types';
 import type {ClientKey} from '~/common/network/types/keys';
-import {assert, unreachable, unwrap} from '~/common/utils/assert';
+import {assert, unreachable} from '~/common/utils/assert';
 import {PROXY_HANDLER} from '~/common/utils/endpoint';
 import type {IQueryableStore} from '~/common/utils/store';
 /**
@@ -108,13 +109,15 @@ export class FetchDirectoryBackend implements DirectoryBackend {
             'user-agent': _services.config.USER_AGENT,
         };
 
-        // OnPrem directory requires authentication using Threema Work credentials
+        // OnPrem directory may use optional HTTP Basic authentication
         if (import.meta.env.BUILD_ENVIRONMENT === 'onprem') {
-            const credentials = unwrap(
-                workData?.get(),
-                'Work credentials not passed to FetchDirectoryBackend in OnPrem build',
-            );
-            this._headers.authorization = `Basic ${u8aToBase64(UTF8.encode(`${credentials.username}:${credentials.password}`))}`;
+            const credentials = workData?.get();
+            if (
+                credentials !== undefined &&
+                (credentials.username !== '' || credentials.password !== '')
+            ) {
+                this._headers.authorization = `Basic ${u8aToBase64(UTF8.encode(`${credentials.username}:${credentials.password}`))}`;
+            }
         }
     }
 
