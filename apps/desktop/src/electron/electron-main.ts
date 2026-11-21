@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -143,8 +144,9 @@ const ABOUT_PANEL_OPTIONS: electron.AboutPanelOptionsOptions = {
         `v${import.meta.env.BUILD_VERSION}` === import.meta.env.GIT_REVISION
             ? ''
             : import.meta.env.GIT_REVISION,
-    copyright: '© Threema AG – Released under the AGPL-3.0 license',
-    website: 'https://threema.ch/',
+    copyright:
+        'Modified 2026 by Treslibre Project (Treslibre). Original work © Threema AG – Released under the AGPL-3.0 license',
+    website: 'https://github.com/Treslibre/treslibre-desktop',
     iconPath: import.meta.env.DEBUG
         ? path.join(
               __dirname,

@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 // @ts-check
 
 import {spawnSync} from 'node:child_process';
@@ -484,7 +485,8 @@ async function packageApp(baseAppName, environment, mode, variant) {
     // See: https://packages.electronjs.org/packager/v19.0.1/interfaces/Options.html.
     console.info('📦 Packaging application with @electron/packager');
     const [outputPath] = await packager({
-        appCopyright: '© Threema AG – Released under the AGPL-3.0 license',
+        appCopyright:
+            'Modified 2026 by Treslibre Project (Treslibre). Original work © Threema AG – Released under the AGPL-3.0 license',
         name: appName,
         electronVersion,
         executableName: 'ThreemaDesktop',

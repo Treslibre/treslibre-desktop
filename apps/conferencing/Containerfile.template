@@ -1,3 +1,4 @@
+# Modified 2026 by Treslibre Project (Treslibre).
 # Serves the pre-built conferencing app as static files with miniserve.
 
 # The base image is pinned by digest.

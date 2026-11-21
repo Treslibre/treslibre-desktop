@@ -1,5 +1,6 @@
 <!--
   @component Renders a settings page that contains app information and settings.
+  Modified 2026 by Treslibre Project (Treslibre).
 -->
 <script lang="ts">
   import type {u53} from '@threema/ts-utils/integer/u53';
@@ -212,12 +213,19 @@
 
   <KeyValueList.Section title={$i18n.t('settings--about.label--licenses-title', 'Licenses')}>
     <KeyValueList.Item key={$i18n.t('settings--about.label--copyright', 'Copyright')}>
-      <Text text="© Threema AG – Released under the AGPL-3.0 license" selectable />
+      <Text
+        text="Modified 2026 by Treslibre Project (Treslibre), an independent fork of Threema. Not affiliated with or endorsed by Threema AG. Original work © Threema AG – Released under the GNU AGPL-3.0 license."
+        selectable
+      />
     </KeyValueList.Item>
 
-    <KeyValueList.Item key="GitHub">
-      <a href="https://github.com/threema-ch/threema-desktop" target="_blank">
-        https://github.com/threema-ch/threema-desktop
+    <KeyValueList.Item key="Source Code (AGPL-3.0)">
+      <a
+        href="https://github.com/Treslibre/treslibre-desktop"
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        https://github.com/Treslibre/treslibre-desktop
       </a>
     </KeyValueList.Item>
 
@@ -233,7 +241,7 @@
         {/snippet}
         {#snippet slot_2()}
           <a
-            href="https://github.com/threema-ch/threema-desktop/blob/stable/LICENSE-3RD-PARTY.txt"
+            href="https://github.com/Treslibre/treslibre-desktop/blob/stable/LICENSE-3RD-PARTY.txt"
             target="_blank"
             rel="noreferrer noopener"
           >
