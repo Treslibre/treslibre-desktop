@@ -1004,6 +1004,13 @@ export enum ElectronIpcCommand {
     UPDATE_APP_BADGE = 'updateAppBadge',
     UPDATE_PUBLIC_KEY_PINS = 'updatePublicKeyPins',
     OPEN_WEBRTC_INTERNALS = 'openWebRtcInternals',
+    GET_SERVER_OBSERVATION = 'getServerObservation',
+    PIN_INITIAL_SERVER_OBSERVATION = 'pinInitialServerObservation',
+    PREVIEW_SERVER_PROVISIONING = 'previewServerProvisioning',
+    ACCEPT_SERVER_KEY_OVERRIDE = 'acceptServerKeyOverride',
+    RESET_SERVER_OBSERVATION = 'resetServerObservation',
+    EVALUATE_CHAT_SERVER_KEY = 'evaluateChatServerKey',
+    ON_SERVER_KEY_CHANGED = 'onServerKeyChanged',
 }
 
 export enum ScreenSharingReminderIpcCommand {

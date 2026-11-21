@@ -9,6 +9,7 @@ import * as electron from 'electron';
 import {ElectronIpcCommand} from '~/common/enum';
 import type {Logger} from '~/common/logging';
 import type {DomainCertificatePin} from '~/common/types';
+import type {EncryptedServerObservationStore} from '~/electron/observation-store';
 /**
  * The verification results as returned by electron.
  *
@@ -121,6 +122,7 @@ export function createTlsCertificateVerifier(
     log: Logger,
     webContents: WebContents,
     certStore?: CertificateStore,
+    observationStore?: EncryptedServerObservationStore,
 ): CertificateVerifier {
     // Sanity-checking of certificate pins
     if (certificatePins !== undefined) {
@@ -181,6 +183,25 @@ export function createTlsCertificateVerifier(
         }
         if (!['OK', 'net::OK'].includes(request.verificationResult)) {
             return invalid(`Verification result is ${request.verificationResult}`);
+        }
+
+        // Evaluate against the TOFU Local Observation Store (§4.3)
+        if (observationStore !== undefined) {
+            const evaluation = observationStore.evaluateTlsCertificateSync({
+                hostname: request.hostname,
+                certPem: request.certificate.data,
+            });
+            if (!evaluation.allowed) {
+                log.error(
+                    `TOFU Server Observation Store blocked unexpected certificate change on ${request.hostname} (${evaluation.alert.component}): old=${evaluation.alert.old_fingerprint}, new=${evaluation.alert.new_fingerprint}`,
+                );
+                if (!webContents.isDestroyed()) {
+                    webContents.send(ElectronIpcCommand.ON_SERVER_KEY_CHANGED, evaluation.alert);
+                }
+                return invalid(
+                    `TOFU pinned SPKI mismatch for ${request.hostname} (${evaluation.alert.component})`,
+                );
+            }
         }
 
         // This is a special case for the connection before the .oppf file is parsed.

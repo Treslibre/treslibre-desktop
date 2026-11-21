@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import type {SettingsNavItemProps} from '~/app/ui/components/partials/settings-nav/internal/settings-nav-list/internal/settings-nav-item/props';
 import type {I18nType} from '~/app/ui/i18n-types';
 import type {SettingsCategory} from '~/common/settings';
@@ -38,7 +39,7 @@ export function getSettingsNavItems(
         security: {
             title: i18n.t('settings.label--security', 'Security'),
             iconName: 'lock',
-            subtitle: i18n.t('settings--security.prose--subtitle', 'Password'),
+            subtitle: i18n.t('settings--security.prose--subtitle', 'Password, Server Trust & Keys'),
         },
         devices: {
             title: i18n.t('settings.label--devices', 'Devices'),

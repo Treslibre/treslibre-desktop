@@ -8,6 +8,8 @@ import {pathToFileURL, URL} from 'node:url';
 import * as v from '@badrap/valita';
 import type {ReadonlyUint8Array} from '@threema/ts-utils/array/readonly-uint8-array';
 import {base64ToU8a} from '@threema/ts-utils/base64/base64-to-u8a';
+import {bytesToHex} from '@threema/ts-utils/byte/bytes-to-hex';
+import {UTF8} from '@threema/ts-utils/codec/utf8';
 import type {u53} from '@threema/ts-utils/integer/u53';
 import {ensureError} from '@threema/ts-utils/meta/ensure-error';
 import {clamp} from '@threema/ts-utils/number/clamp';
@@ -19,7 +21,19 @@ import {Menu, type IpcMainEvent, type MenuItemConstructorOptions} from 'electron
 import * as electron from 'electron';
 
 import {STATIC_CONFIG} from '~/common/config';
-import type {DeleteProfileOptions, ErrorDetails, SystemInfo} from '~/common/electron-ipc';
+import {
+    calculateOppfBodyOffset,
+    extractOppfBodyAndSignature,
+    type OppfFile,
+    OPPF_FILE_SCHEMA,
+    parseCleanroomProvisioning,
+} from '~/common/dom/backend/onprem/oppf';
+import type {
+    DeleteProfileOptions,
+    ErrorDetails,
+    ServerTrustPreview,
+    SystemInfo,
+} from '~/common/electron-ipc';
 import {ElectronIpcCommand, ScreenSharingReminderIpcCommand} from '~/common/enum';
 import {extractErrorTraceback} from '~/common/error';
 import {
@@ -41,6 +55,7 @@ import {directoryModeInternalObjectIfPosix, fileModeInternalObjectIfPosix} from 
 import {FileLogger} from '~/common/node/logging';
 import {removeOldProfiles, getLatestProfilePath} from '~/common/node/old-profiles';
 import {getSafeStoragePasswordPath} from '~/common/node/safe-storage/helpers';
+import type {ObservedComponent} from '~/common/observation';
 import {
     ensureRemoteSecretMonitorErrorType,
     type RemoteSecretErrorType,
@@ -65,6 +80,11 @@ import {
     showScreenSharingReminder,
     validateSenderFrame,
 } from './electron-utils';
+import {
+    EncryptedServerObservationStore,
+    probeHttpsEndpointCertificate,
+    verifyEd25519WithNodeCrypto,
+} from './observation-store';
 import {
     checkPinsAgainstCertStore,
     type CertificateStore,
@@ -1093,9 +1113,15 @@ function main(
                 // Sanity check because we do not want non-onprem builds to tamper with the pins.
                 assert(import.meta.env.BUILD_ENVIRONMENT === 'onprem');
                 // Update the verifier proc so future connections to new (not-yet-cached)
-                // hosts are validated against the new pins.
+                // hosts are validated against the new pins and the TOFU observation store.
                 session.setCertificateVerifyProc(
-                    createTlsCertificateVerifier(publicKeyPins, log, event.sender, certStore),
+                    createTlsCertificateVerifier(
+                        publicKeyPins,
+                        log,
+                        event.sender,
+                        certStore,
+                        observationStore,
+                    ),
                 );
 
                 // Chromium caches TLS cert verification results per {hostname, certificate},
@@ -1134,6 +1160,207 @@ function main(
                     url: event.sender.getURL(),
                 },
             });
+        });
+
+        const observationStore = new EncryptedServerObservationStore(
+            path.join(appPath, 'data'),
+            log,
+        );
+        void observationStore.load().catch((error: unknown) => {
+            log.warn('Failed to preload server observation record:', error);
+        });
+
+        electron.ipcMain.handle(ElectronIpcCommand.GET_SERVER_OBSERVATION, async (event) => {
+            validateSenderFrame(event.senderFrame);
+            return observationStore.getCached() ?? (await observationStore.load());
+        });
+
+        electron.ipcMain.handle(
+            ElectronIpcCommand.PREVIEW_SERVER_PROVISIONING,
+            async (
+                event,
+                oppfUrl: string,
+                username: string,
+                password: string,
+                userAgent: string,
+            ): Promise<ServerTrustPreview> => {
+                validateSenderFrame(event.senderFrame);
+                const rawBuffer = await getOppFile(
+                    event,
+                    oppfUrl,
+                    username,
+                    password,
+                    userAgent,
+                    log,
+                );
+                const data = new Uint8Array(rawBuffer);
+                const rawTrimmed = UTF8.decode(data).trim();
+
+                /* eslint-disable @typescript-eslint/naming-convention, @typescript-eslint/no-restricted-types */
+                let parsedOppf: OppfFile;
+                let adminPubkeyHex: string | null = null;
+                let serverId: string;
+                let chatHost: string;
+                let chatPort = 5222;
+
+                if (rawTrimmed.startsWith('{') && rawTrimmed.endsWith('}')) {
+                    const rawObj = JSON.parse(rawTrimmed) as Record<string, unknown>;
+                    if (
+                        Object.hasOwn(rawObj, 'server_id') &&
+                        Object.hasOwn(rawObj, 'chat_pubkey_curve25519')
+                    ) {
+                        const cleanParsed = parseCleanroomProvisioning(rawObj);
+                        parsedOppf = cleanParsed.parsed;
+                        serverId = String(rawObj.server_id);
+                        chatHost =
+                            typeof rawObj.chat_host === 'string' ? rawObj.chat_host : serverId;
+                        chatPort = typeof rawObj.chat_port === 'number' ? rawObj.chat_port : 5222;
+                        if (typeof rawObj.admin_signing_pubkey_ed25519 === 'string') {
+                            const rawAdmin = rawObj.admin_signing_pubkey_ed25519.trim();
+                            adminPubkeyHex = /^[0-9a-fA-F]{64}$/u.test(rawAdmin)
+                                ? rawAdmin.toLowerCase()
+                                : bytesToHex(base64ToU8a(rawAdmin)).toLowerCase();
+                        }
+                    } else {
+                        throw new Error('Unsigned JSON file is missing required cleanroom fields');
+                    }
+                } else {
+                    const offset = calculateOppfBodyOffset(data);
+                    const {body, signature} = extractOppfBodyAndSignature(data, offset);
+                    const sigBytes = base64ToU8a(UTF8.decode(signature));
+                    const decoded = JSON.parse(UTF8.decode(body)) as Record<string, unknown>;
+                    parsedOppf = OPPF_FILE_SCHEMA.parse(decoded);
+                    if (!verifyEd25519WithNodeCrypto(parsedOppf.signatureKey, body, sigBytes)) {
+                        throw new Error('OPPF Ed25519 signature verification failed');
+                    }
+                    if (new Date() > parsedOppf.license.expires) {
+                        throw new Error(`OPPF file expired at ${parsedOppf.license.expires}`);
+                    }
+                    adminPubkeyHex = bytesToHex(parsedOppf.signatureKey).toLowerCase();
+                    const chatObj = decoded.chat as Record<string, unknown> | undefined;
+                    chatHost =
+                        typeof chatObj?.hostname === 'string'
+                            ? chatObj.hostname
+                            : new URL(parsedOppf.directory.url.href).hostname;
+                    const ports = Array.isArray(chatObj?.ports) ? chatObj.ports : [5222];
+                    chatPort = typeof ports[0] === 'number' ? ports[0] : 5222;
+                    serverId = typeof decoded.server_id === 'string' ? decoded.server_id : chatHost;
+                }
+
+                const chatPubkeyHex = bytesToHex(parsedOppf.chat.publicKey).toLowerCase();
+                const dirUrl = parsedOppf.directory.url.href;
+                const safeUrl = parsedOppf.safe.url;
+                const blobObj = (
+                    JSON.parse(
+                        rawTrimmed.startsWith('{') && rawTrimmed.endsWith('}')
+                            ? JSON.stringify(parsedOppf)
+                            : UTF8.decode(
+                                  extractOppfBodyAndSignature(data, calculateOppfBodyOffset(data))
+                                      .body,
+                              ),
+                    ) as {blob?: {uploadUrl?: string}}
+                ).blob;
+                const blobUrl = blobObj?.uploadUrl ?? parsedOppf.mediator.blob.uploadUrl;
+
+                // Probe live TLS certificates (or use synthetic fallback for offline/non-resolvable test hosts)
+                async function probeOrFallback(targetUrl: string): Promise<{
+                    readonly host: string;
+                    readonly spki_sha256: string;
+                    readonly leaf_sha256: string;
+                }> {
+                    const host = new URL(targetUrl).hostname;
+                    try {
+                        return await probeHttpsEndpointCertificate(targetUrl);
+                    } catch (probeErr) {
+                        log.warn(
+                            `Live TLS probe for ${host} did not complete (${probeErr}); using configured domain pin or pending pin`,
+                        );
+                        const matchingPin = parsedOppf.domains?.rules.find(
+                            (r) =>
+                                r.fqdn.toLowerCase() === host.toLowerCase() ||
+                                host
+                                    .toLowerCase()
+                                    .endsWith(`.${r.fqdn.replace(/^\*\./u, '').toLowerCase()}`),
+                        );
+                        const firstSpki = matchingPin?.spkis[0]?.value;
+                        return {
+                            host,
+                            spki_sha256:
+                                firstSpki !== undefined
+                                    ? Buffer.from(firstSpki).toString('base64')
+                                    : 'UNPROBED',
+                            leaf_sha256: '0'.repeat(64),
+                        };
+                    }
+                }
+
+                const [dirEndpoint, blobEndpoint, safeEndpoint] = await Promise.all([
+                    probeOrFallback(dirUrl),
+                    probeOrFallback(blobUrl),
+                    probeOrFallback(safeUrl),
+                ]);
+
+                return {
+                    server_id: serverId,
+                    chat_host: chatHost,
+                    chat_port: chatPort,
+                    chat_server_pubkey_curve25519: chatPubkeyHex,
+                    http_endpoints: {
+                        directory: dirEndpoint,
+                        blob: blobEndpoint,
+                        safe: safeEndpoint,
+                    },
+                    admin_signing_pubkey_ed25519: adminPubkeyHex,
+                };
+                /* eslint-enable @typescript-eslint/naming-convention, @typescript-eslint/no-restricted-types */
+            },
+        );
+
+        electron.ipcMain.handle(
+            ElectronIpcCommand.PIN_INITIAL_SERVER_OBSERVATION,
+            async (event, preview: ServerTrustPreview) => {
+                validateSenderFrame(event.senderFrame);
+                return await observationStore.pinInitialServer({
+                    /* eslint-disable @typescript-eslint/naming-convention */
+                    server_id: preview.server_id,
+                    chat_server_pubkey_curve25519: preview.chat_server_pubkey_curve25519,
+                    http_endpoints: preview.http_endpoints,
+                    admin_signing_pubkey_ed25519: preview.admin_signing_pubkey_ed25519,
+                    /* eslint-enable @typescript-eslint/naming-convention */
+                });
+            },
+        );
+
+        electron.ipcMain.handle(
+            ElectronIpcCommand.EVALUATE_CHAT_SERVER_KEY,
+            async (event, observedPubkeyHex: string) => {
+                validateSenderFrame(event.senderFrame);
+                const result = await observationStore.evaluateChatServerKey({observedPubkeyHex});
+                if (!result.allowed) {
+                    event.sender.send(ElectronIpcCommand.ON_SERVER_KEY_CHANGED, result.alert);
+                }
+                return result;
+            },
+        );
+
+        electron.ipcMain.handle(
+            ElectronIpcCommand.ACCEPT_SERVER_KEY_OVERRIDE,
+            async (
+                event,
+                params: {
+                    readonly component: ObservedComponent;
+                    readonly newFingerprint: string;
+                    readonly newLeafSha256?: string;
+                },
+            ) => {
+                validateSenderFrame(event.senderFrame);
+                return await observationStore.acceptManualOverride(params);
+            },
+        );
+
+        electron.ipcMain.handle(ElectronIpcCommand.RESET_SERVER_OBSERVATION, async (event) => {
+            validateSenderFrame(event.senderFrame);
+            await observationStore.clear();
         });
 
         electron.ipcMain.handle(

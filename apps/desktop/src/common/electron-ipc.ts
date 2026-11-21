@@ -1,9 +1,31 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import type {ReadonlyUint8Array} from '@threema/ts-utils/array/readonly-uint8-array';
 import type {u53} from '@threema/ts-utils/integer/u53';
 
 import type {LogInfo} from '~/common/node/file-storage/log-info';
+import type {
+    ObservedComponent,
+    ObservedHttpEndpoint,
+    ServerKeyChangeAlert,
+    ServerObservationRecord,
+} from '~/common/observation';
 import type {RemoteSecretErrorType} from '~/common/remote-secret';
 import type {DomainCertificatePin} from '~/common/types';
+
+export interface ServerTrustPreview {
+    /* eslint-disable @typescript-eslint/naming-convention, @typescript-eslint/no-restricted-types */
+    readonly server_id: string;
+    readonly chat_host: string;
+    readonly chat_port: number;
+    readonly chat_server_pubkey_curve25519: string;
+    readonly http_endpoints: {
+        readonly directory: ObservedHttpEndpoint;
+        readonly blob: ObservedHttpEndpoint;
+        readonly safe: ObservedHttpEndpoint;
+    };
+    readonly admin_signing_pubkey_ed25519: string | null;
+    /* eslint-enable @typescript-eslint/naming-convention, @typescript-eslint/no-restricted-types */
+}
 
 export interface ErrorDetails {
     readonly message: string;
@@ -298,6 +320,60 @@ export interface ElectronIpc {
      * Enable or disable screenshot protection
      */
     readonly setScreenshotProtection: (enable: boolean) => void;
+
+    /**
+     * Get the current encrypted TOFU Server Observation Record, if any (§4.2).
+     */
+    readonly getServerObservation: () => Promise<ServerObservationRecord | undefined>;
+
+    /**
+     * Preview an OPPF / cleanroom provisioning payload and probe live TLS SPKI fingerprints
+     * for the First-Time Server Trust Prompt (§4.1).
+     */
+    readonly previewServerProvisioning: (
+        oppfUrl: string,
+        username: string,
+        password: string,
+        userAgent: string,
+    ) => Promise<ServerTrustPreview>;
+
+    /**
+     * Persist the initial TOFU Server Observation Record after user confirmation (§4.1 & §4.2).
+     */
+    readonly pinInitialServerObservation: (
+        preview: ServerTrustPreview,
+    ) => Promise<ServerObservationRecord>;
+
+    /**
+     * Evaluate the chat server's Curve25519 public key against the pinned TOFU record (§4.3).
+     */
+    readonly evaluateChatServerKey: (
+        observedPubkeyHex: string,
+    ) => Promise<
+        | {readonly allowed: true; readonly record?: ServerObservationRecord}
+        | {readonly allowed: false; readonly alert: ServerKeyChangeAlert}
+    >;
+
+    /**
+     * Accept a manual server key/certificate override after secondary user confirmation (§4.3).
+     */
+    readonly acceptServerKeyOverride: (params: {
+        readonly component: ObservedComponent;
+        readonly newFingerprint: string;
+        readonly newLeafSha256?: string;
+    }) => Promise<ServerObservationRecord>;
+
+    /**
+     * Reset the pinned server observation record and return to initial setup (§4.4).
+     */
+    readonly resetServerObservation: () => Promise<void>;
+
+    /**
+     * Register a callback invoked when an unexpected server key or TLS certificate change is blocked (§4.3).
+     */
+    readonly registerOnServerKeyChangedCallback: (
+        callback: (alert: ServerKeyChangeAlert) => void,
+    ) => void;
 }
 
 export interface ScreenSharingReminderDetails {

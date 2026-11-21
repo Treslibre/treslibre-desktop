@@ -1039,6 +1039,15 @@ export class Backend {
                     );
                 }
                 config = createConfigFromOppf(onPremOppfFile);
+                const chatKeyEval = await phase1Services.electron.evaluateChatServerKey(
+                    bytesToHex(config.CHAT_SERVER_KEY),
+                );
+                if (!chatKeyEval.allowed) {
+                    throw new BackendCreationError(
+                        'update-public-key-pins-error',
+                        `Chat server Curve25519 key mismatch blocked by TOFU Observation Store: old=${chatKeyEval.alert.old_fingerprint}, new=${chatKeyEval.alert.new_fingerprint}`,
+                    );
+                }
                 checkForUpdates =
                     onPremOppfFile.updates?.desktop?.autoUpdate === true &&
                     // Turn off the auto updater in custom builds.

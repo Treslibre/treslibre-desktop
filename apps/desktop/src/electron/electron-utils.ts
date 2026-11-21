@@ -160,6 +160,10 @@ export async function checkOppFile(
 ): Promise<u53> {
     validateSenderFrame(event.senderFrame);
 
+    if (oppfUrl.startsWith('data:')) {
+        return 200;
+    }
+
     const session = getIsolatedSession('oppf-fetch', log, event.sender);
     const authHeader: Record<string, string> =
         username !== '' || password !== ''
@@ -186,6 +190,19 @@ export async function getOppFile(
     log: Logger,
 ): Promise<ArrayBuffer> {
     validateSenderFrame(event.senderFrame);
+
+    if (oppfUrl.startsWith('data:')) {
+        const commaIndex = oppfUrl.indexOf(',');
+        if (commaIndex === -1) {
+            throw new Error('Invalid inline data: provisioning URL');
+        }
+        const header = oppfUrl.slice(0, commaIndex);
+        const payload = oppfUrl.slice(commaIndex + 1);
+        const bytes = header.includes(';base64')
+            ? Buffer.from(payload, 'base64')
+            : Buffer.from(decodeURIComponent(payload), 'utf8');
+        return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    }
 
     const session = getIsolatedSession('oppf-fetch', log, event.sender);
     const authHeader: Record<string, string> =

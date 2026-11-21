@@ -3140,6 +3140,20 @@ export namespace ElectronIpcCommand {
     export type UPDATE_PUBLIC_KEY_PINS = typeof UPDATE_PUBLIC_KEY_PINS;
     export const OPEN_WEBRTC_INTERNALS = 'openWebRtcInternals';
     export type OPEN_WEBRTC_INTERNALS = typeof OPEN_WEBRTC_INTERNALS;
+    export const GET_SERVER_OBSERVATION = 'getServerObservation';
+    export type GET_SERVER_OBSERVATION = typeof GET_SERVER_OBSERVATION;
+    export const PIN_INITIAL_SERVER_OBSERVATION = 'pinInitialServerObservation';
+    export type PIN_INITIAL_SERVER_OBSERVATION = typeof PIN_INITIAL_SERVER_OBSERVATION;
+    export const PREVIEW_SERVER_PROVISIONING = 'previewServerProvisioning';
+    export type PREVIEW_SERVER_PROVISIONING = typeof PREVIEW_SERVER_PROVISIONING;
+    export const ACCEPT_SERVER_KEY_OVERRIDE = 'acceptServerKeyOverride';
+    export type ACCEPT_SERVER_KEY_OVERRIDE = typeof ACCEPT_SERVER_KEY_OVERRIDE;
+    export const RESET_SERVER_OBSERVATION = 'resetServerObservation';
+    export type RESET_SERVER_OBSERVATION = typeof RESET_SERVER_OBSERVATION;
+    export const EVALUATE_CHAT_SERVER_KEY = 'evaluateChatServerKey';
+    export type EVALUATE_CHAT_SERVER_KEY = typeof EVALUATE_CHAT_SERVER_KEY;
+    export const ON_SERVER_KEY_CHANGED = 'onServerKeyChanged';
+    export type ON_SERVER_KEY_CHANGED = typeof ON_SERVER_KEY_CHANGED;
 }
 /**
  * ELECTRON

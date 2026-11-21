@@ -1,5 +1,12 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import type {u53} from '@threema/ts-utils/integer/u53';
 
+import type {ServerTrustPreview} from '~/common/electron-ipc';
+import type {
+    ObservedComponent,
+    ServerKeyChangeAlert,
+    ServerObservationRecord,
+} from '~/common/observation';
 import type {RemoteSecretErrorType} from '~/common/remote-secret';
 import type {DomainCertificatePin} from '~/common/types';
 import type {ProxyMarked} from '~/common/utils/endpoint';
@@ -106,4 +113,27 @@ export interface IFrontendElectronService extends ProxyMarked {
      * Signal to the electron main thread to set screenshot protection.
      */
     readonly setScreenshotProtection: (enable: boolean) => void;
+
+    readonly getServerObservation: () => Promise<ServerObservationRecord | undefined>;
+    readonly previewServerProvisioning: (
+        oppfUrl: string,
+        username: string,
+        password: string,
+        userAgent: string,
+    ) => Promise<ServerTrustPreview>;
+    readonly pinInitialServerObservation: (
+        preview: ServerTrustPreview,
+    ) => Promise<ServerObservationRecord>;
+    readonly evaluateChatServerKey: (
+        observedPubkeyHex: string,
+    ) => Promise<
+        | {readonly allowed: true; readonly record?: ServerObservationRecord}
+        | {readonly allowed: false; readonly alert: ServerKeyChangeAlert}
+    >;
+    readonly acceptServerKeyOverride: (params: {
+        readonly component: ObservedComponent;
+        readonly newFingerprint: string;
+        readonly newLeafSha256?: string;
+    }) => Promise<ServerObservationRecord>;
+    readonly resetServerObservation: () => Promise<void>;
 }

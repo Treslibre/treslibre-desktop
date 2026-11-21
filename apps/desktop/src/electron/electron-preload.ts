@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 /**
  * The preload script runs in the renderer process, but – as long as
  * `contextIsolation` is enabled in electron – in a sandboxed environment
@@ -15,9 +16,11 @@ import type {
     ElectronIpc,
     ErrorDetails,
     ScreenSharingSource,
+    ServerTrustPreview,
 } from '~/common/electron-ipc';
 import {ElectronIpcCommand} from '~/common/enum';
 import {CONSOLE_LOGGER} from '~/common/logging';
+import type {ObservedComponent, ServerKeyChangeAlert} from '~/common/observation';
 import type {RemoteSecretErrorType} from '~/common/remote-secret';
 import type {DomainCertificatePin} from '~/common/types';
 
@@ -135,6 +138,36 @@ contextBridge.exposeInMainWorld('consumeElectronApi', (): ElectronIpc | undefine
         openWebRtcInternals: () => ipcRenderer.send(ElectronIpcCommand.OPEN_WEBRTC_INTERNALS),
         setScreenshotProtection: (enable: boolean) =>
             ipcRenderer.send(ElectronIpcCommand.SET_SCREENSHOT_PROTECTION, enable),
+        getServerObservation: () => ipcRenderer.invoke(ElectronIpcCommand.GET_SERVER_OBSERVATION),
+        previewServerProvisioning: (
+            oppfUrl: string,
+            username: string,
+            password: string,
+            userAgent: string,
+        ) =>
+            ipcRenderer.invoke(
+                ElectronIpcCommand.PREVIEW_SERVER_PROVISIONING,
+                oppfUrl,
+                username,
+                password,
+                userAgent,
+            ),
+        pinInitialServerObservation: (preview: ServerTrustPreview) =>
+            ipcRenderer.invoke(ElectronIpcCommand.PIN_INITIAL_SERVER_OBSERVATION, preview),
+        evaluateChatServerKey: (observedPubkeyHex: string) =>
+            ipcRenderer.invoke(ElectronIpcCommand.EVALUATE_CHAT_SERVER_KEY, observedPubkeyHex),
+        acceptServerKeyOverride: (params: {
+            readonly component: ObservedComponent;
+            readonly newFingerprint: string;
+            readonly newLeafSha256?: string;
+        }) => ipcRenderer.invoke(ElectronIpcCommand.ACCEPT_SERVER_KEY_OVERRIDE, params),
+        resetServerObservation: () =>
+            ipcRenderer.invoke(ElectronIpcCommand.RESET_SERVER_OBSERVATION),
+        registerOnServerKeyChangedCallback: (callback: (alert: ServerKeyChangeAlert) => void) =>
+            ipcRenderer.on(
+                ElectronIpcCommand.ON_SERVER_KEY_CHANGED,
+                (_, alert: ServerKeyChangeAlert) => callback(alert),
+            ),
     };
 });
 /* eslint-enable @typescript-eslint/promise-function-async */

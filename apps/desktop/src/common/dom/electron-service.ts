@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 import type {ReadonlyUint8Array} from '@threema/ts-utils/array/readonly-uint8-array';
 import type {u53} from '@threema/ts-utils/integer/u53';
 
@@ -6,11 +7,17 @@ import type {
     ElectronIpc,
     ErrorDetails,
     ScreenSharingSource,
+    ServerTrustPreview,
     SystemInfo,
 } from '~/common/electron-ipc';
 import type {IFrontendElectronService} from '~/common/electron-service';
 import {TRANSFER_HANDLER} from '~/common/index';
 import type {LogInfo} from '~/common/node/file-storage/log-info';
+import type {
+    ObservedComponent,
+    ServerKeyChangeAlert,
+    ServerObservationRecord,
+} from '~/common/observation';
 import type {RemoteSecretErrorType} from '~/common/remote-secret';
 import type {DomainCertificatePin} from '~/common/types';
 import {unwrap} from '~/common/utils/assert';
@@ -70,6 +77,12 @@ export class ElectronIpcService implements ElectronIpc {
             triggerInvalidCertificatePins: this.triggerInvalidCertificatePins.bind(this),
             signalRestartReady: this.signalRestartReady.bind(this),
             setScreenshotProtection: this.setScreenshotProtection.bind(this),
+            getServerObservation: this.getServerObservation.bind(this),
+            previewServerProvisioning: this.previewServerProvisioning.bind(this),
+            pinInitialServerObservation: this.pinInitialServerObservation.bind(this),
+            evaluateChatServerKey: this.evaluateChatServerKey.bind(this),
+            acceptServerKeyOverride: this.acceptServerKeyOverride.bind(this),
+            resetServerObservation: this.resetServerObservation.bind(this),
         };
     }
 
@@ -304,5 +317,58 @@ export class ElectronIpcService implements ElectronIpc {
     /** @inheritdoc */
     public setScreenshotProtection(enable: boolean): void {
         this._api.setScreenshotProtection(enable);
+    }
+
+    /** @inheritdoc */
+    public async getServerObservation(): Promise<ServerObservationRecord | undefined> {
+        return await this._api.getServerObservation();
+    }
+
+    /** @inheritdoc */
+    public async previewServerProvisioning(
+        oppfUrl: string,
+        username: string,
+        password: string,
+        userAgent: string,
+    ): Promise<ServerTrustPreview> {
+        return await this._api.previewServerProvisioning(oppfUrl, username, password, userAgent);
+    }
+
+    /** @inheritdoc */
+    public async pinInitialServerObservation(
+        preview: ServerTrustPreview,
+    ): Promise<ServerObservationRecord> {
+        return await this._api.pinInitialServerObservation(preview);
+    }
+
+    /** @inheritdoc */
+    public async evaluateChatServerKey(
+        observedPubkeyHex: string,
+    ): Promise<
+        | {readonly allowed: true; readonly record?: ServerObservationRecord}
+        | {readonly allowed: false; readonly alert: ServerKeyChangeAlert}
+    > {
+        return await this._api.evaluateChatServerKey(observedPubkeyHex);
+    }
+
+    /** @inheritdoc */
+    public async acceptServerKeyOverride(params: {
+        readonly component: ObservedComponent;
+        readonly newFingerprint: string;
+        readonly newLeafSha256?: string;
+    }): Promise<ServerObservationRecord> {
+        return await this._api.acceptServerKeyOverride(params);
+    }
+
+    /** @inheritdoc */
+    public async resetServerObservation(): Promise<void> {
+        await this._api.resetServerObservation();
+    }
+
+    /** @inheritdoc */
+    public registerOnServerKeyChangedCallback(
+        callback: (alert: ServerKeyChangeAlert) => void,
+    ): void {
+        this._api.registerOnServerKeyChangedCallback(callback);
     }
 }

@@ -1,3 +1,4 @@
+<!-- Modified 2026 by Treslibre Project (Treslibre). -->
 <script lang="ts">
   import type {u53} from '@threema/ts-utils/integer/u53';
   import {TIMER} from '@threema/ts-utils/timer/global-timer';
@@ -12,6 +13,7 @@
   import ConversationNav from '~/app/ui/components/partials/conversation-nav/ConversationNav.svelte';
   import GroupDetail from '~/app/ui/components/partials/group-detail/GroupDetail.svelte';
   import EditGroupMembersModal from '~/app/ui/components/partials/modals/edit-group-members-modal/EditGroupMembersModal.svelte';
+  import ServerKeyChangedModal from '~/app/ui/components/partials/modals/server-key-changed-modal/ServerKeyChangedModal.svelte';
   import NavBar from '~/app/ui/components/partials/navbar/NavBar.svelte';
   import ReceiverNav from '~/app/ui/components/partials/receiver-nav/ReceiverNav.svelte';
   import Settings from '~/app/ui/components/partials/settings/Settings.svelte';
@@ -27,6 +29,7 @@
   import type {IGlobalPropertyModel} from '~/common/model/types/settings';
   import type {ModelStore} from '~/common/model/utils/model-store';
   import {ConnectionState} from '~/common/network/protocol/state';
+  import type {ServerKeyChangeAlert} from '~/common/observation';
   import {unreachable} from '~/common/utils/assert';
   import type {Remote} from '~/common/utils/endpoint';
 
@@ -53,6 +56,7 @@
 
   // Initialize activity display state.
   let activityDisplayState: 'collapsed' | 'expanded' = $state('collapsed');
+  let serverKeyChangeAlert = $state<ServerKeyChangeAlert | undefined>(undefined);
 
   function handleKeydown(event: KeyboardEvent): void {
     // Only trigger handler if `event.target` is the element itself.
@@ -180,6 +184,10 @@
     displayModeObserver.update();
     const displayModeObserverUnsubscriber = manageLayout({display, router}, layout);
 
+    services.electron.registerOnServerKeyChangedCallback((alert) => {
+      serverKeyChangeAlert = alert;
+    });
+
     // Listen for key events on `<body>`.
     document.body.addEventListener('keydown', handleKeydown);
 
@@ -241,6 +249,13 @@
 
     {#if ModalComponent !== undefined}
       <ModalComponent {services} />
+    {/if}
+    {#if serverKeyChangeAlert !== undefined}
+      <ServerKeyChangedModal
+        alert={serverKeyChangeAlert}
+        {services}
+        onDismiss={() => (serverKeyChangeAlert = undefined)}
+      />
     {/if}
   </div>
 

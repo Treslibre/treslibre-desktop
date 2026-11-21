@@ -1,3 +1,4 @@
+// Modified 2026 by Treslibre Project (Treslibre).
 /**
  * Layer 3: Authentication and transport encryption layer.
  *
@@ -474,6 +475,14 @@ export class Layer3Decoder<TType extends 'full' | 'd2m-only'>
         const {config} = this._services;
         const {csp} = this._controller;
         const buffer = this._buffer;
+
+        // Verify the configured Chat Server Curve25519 public key is non-zero before decrypting ServerHello (§4.3)
+        if (config.CHAT_SERVER_KEY.every((byte) => byte === 0)) {
+            throw new ProtocolError(
+                'csp',
+                'Chat server Curve25519 public key is unconfigured (all-zero)',
+            );
+        }
 
         // Decrypt and decode `server-challenge-response`
         return structbuf.csp.handshake.ServerChallengeResponse.decode(
