@@ -88,10 +88,19 @@ jobs:
         with:
           workspaces: packages/libthreema-wasm/libs/libthreema
 
-      - name: Install wasm-bindgen-cli and binaryen
+      - name: Install wasm-bindgen-cli
         uses: taiki-e/install-action@v2
         with:
-          tool: wasm-bindgen-cli@0.2.114,binaryen
+          tool: wasm-bindgen-cli@0.2.114
+
+      - name: Install binaryen (wasm-opt)
+        run: |
+          curl -fsSL https://github.com/WebAssembly/binaryen/releases/download/version_124/binaryen-version_124-x86_64-linux.tar.gz -o /tmp/binaryen.tar.gz
+          sudo mkdir -p /usr/local/binaryen
+          sudo tar -xzf /tmp/binaryen.tar.gz -C /usr/local/binaryen --strip-components=1
+          rm /tmp/binaryen.tar.gz
+          echo "/usr/local/binaryen/bin" >> "$GITHUB_PATH"
+          /usr/local/binaryen/bin/wasm-opt --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -134,10 +143,27 @@ jobs:
           toolchain: '1.94'
           targets: wasm32-unknown-unknown
 
-      - name: Install wasm-bindgen-cli, binaryen, and protoc
+      - name: Install wasm-bindgen-cli
         uses: taiki-e/install-action@v2
         with:
-          tool: wasm-bindgen-cli@0.2.114,binaryen,protoc
+          tool: wasm-bindgen-cli@0.2.114
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: Install binaryen (wasm-opt)
+        shell: pwsh
+        run: |
+          $url = "https://github.com/WebAssembly/binaryen/releases/download/version_124/binaryen-version_124-x86_64-windows.tar.gz"
+          $archive = Join-Path $env:RUNNER_TEMP "binaryen.tar.gz"
+          $dest = Join-Path $env:RUNNER_TEMP "binaryen"
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          tar -xzf $archive -C $dest
+          Remove-Item $archive
+          $binDir = Join-Path $dest "binaryen-version_124\bin"
+          Add-Content -Path $env:GITHUB_PATH -Value $binDir
+          & (Join-Path $binDir "wasm-opt.exe") --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -148,6 +174,7 @@ jobs:
           TURBO_BUILD_ENVIRONMENT: onprem
           TURBO_BUILD_VARIANT: work
         run: |
+          pnpm run build:packages
           pnpm --filter threema-desktop run build
           pnpm --filter threema-desktop run dist
 
