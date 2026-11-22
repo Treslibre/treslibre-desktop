@@ -220,3 +220,168 @@ jobs:
         with:
           name: treslibre-desktop-win32-x64
           path: build/apps/desktop/packaged/Treslibre-win32-x64
+
+  dist-linux:
+    name: Linux Dist (work-onprem)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: [debrand-audit, lint-build-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install protobuf compiler
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends protobuf-compiler
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.94'
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            packages/libthreema-wasm/libs/libthreema
+            apps/desktop/src/rust/launcher
+
+      - name: Install wasm-bindgen-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@0.2.114
+
+      - name: Install binaryen (wasm-opt)
+        run: |
+          curl -fsSL https://github.com/WebAssembly/binaryen/releases/download/version_124/binaryen-version_124-x86_64-linux.tar.gz -o /tmp/binaryen.tar.gz
+          sudo mkdir -p /usr/local/binaryen
+          sudo tar -xzf /tmp/binaryen.tar.gz -C /usr/local/binaryen --strip-components=1
+          rm /tmp/binaryen.tar.gz
+          echo "/usr/local/binaryen/bin" >> "$GITHUB_PATH"
+          /usr/local/binaryen/bin/wasm-opt --version
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and package Linux dist
+        run: |
+          pnpm run build:packages
+          pnpm run build:desktop:work-onprem
+          pnpm run dist:desktop:work-onprem
+
+      - name: Archive Linux package
+        run: |
+          tar -czf build/apps/desktop/packaged/Treslibre-linux-x64.tar.gz \
+            -C build/apps/desktop/packaged Treslibre-linux-x64
+
+      - name: Upload Linux packaged artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: treslibre-desktop-linux-x64
+          path: build/apps/desktop/packaged/Treslibre-linux-x64.tar.gz
+
+  dist-macos:
+    name: macOS Dist (work-onprem, arm64)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: [debrand-audit, lint-build-test]
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.94'
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            packages/libthreema-wasm/libs/libthreema
+            apps/desktop/src/rust/launcher
+            apps/desktop/src/rust/helper
+
+      - name: Install wasm-bindgen-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@0.2.114
+
+      - name: Install binaryen (wasm-opt)
+        run: |
+          if curl -fsSL https://github.com/WebAssembly/binaryen/releases/download/version_124/binaryen-version_124-arm64-macos.tar.gz -o /tmp/binaryen.tar.gz; then
+            mkdir -p "$RUNNER_TEMP/binaryen"
+            tar -xzf /tmp/binaryen.tar.gz -C "$RUNNER_TEMP/binaryen" --strip-components=1
+            rm /tmp/binaryen.tar.gz
+            echo "$RUNNER_TEMP/binaryen/bin" >> "$GITHUB_PATH"
+            "$RUNNER_TEMP/binaryen/bin/wasm-opt" --version
+          else
+            brew install binaryen
+            wasm-opt --version
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and package macOS dist
+        run: |
+          pnpm run build:packages
+          pnpm run build:desktop:work-onprem
+          pnpm run dist:desktop:work-onprem
+
+      - name: Archive macOS package
+        run: |
+          tar -czf build/apps/desktop/packaged/Treslibre-darwin-arm64.tar.gz \
+            -C build/apps/desktop/packaged Treslibre-darwin-arm64
+
+      - name: Upload macOS packaged artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: treslibre-desktop-darwin-arm64
+          path: build/apps/desktop/packaged/Treslibre-darwin-arm64.tar.gz
