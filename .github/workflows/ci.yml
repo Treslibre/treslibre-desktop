@@ -58,6 +58,31 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
+      - name: Configure node-gyp v12 for Visual Studio 2026 (v18)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ngDir = Join-Path $env:RUNNER_TEMP "node-gyp12"
+          npm install --prefix $ngDir node-gyp@12
+          $ngPkgDir = (Join-Path $ngDir "node_modules\node-gyp").Replace("\", "/")
+          $hookPath = (Join-Path $env:RUNNER_TEMP "use-node-gyp12.cjs")
+          $hookContent = @"
+          const Module = require('module');
+          const origResolve = Module._resolveFilename;
+          const ngDir = '$ngPkgDir';
+          Module._resolveFilename = function (request, parent, isMain, options) {
+            if (request === 'node-gyp') return origResolve.call(this, ngDir, parent, isMain, options);
+            if (request.startsWith('node-gyp/')) return origResolve.call(this, ngDir + '/' + request.slice(9), parent, isMain, options);
+            return origResolve.call(this, request, parent, isMain, options);
+          };
+          "@
+          Set-Content -Path $hookPath -Value $hookContent -Encoding UTF8
+          $hookPosix = $hookPath.Replace("\", "/")
+          Add-Content -Path $env:GITHUB_ENV -Value "NODE_OPTIONS=--require $hookPosix"
+          Add-Content -Path $env:GITHUB_ENV -Value "npm_config_node_gyp=$ngPkgDir/bin/node-gyp.js"
+          $env:NODE_OPTIONS = "--require $hookPosix"
+          node -e "console.log('node-gyp override version:', require('node-gyp/package.json').version)"
+
       - name: Enable Corepack
         run: corepack enable
 
@@ -124,9 +149,7 @@ jobs:
     name: Windows Dist (work-onprem)
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: [debrand-audit, lint-build-test]
-    runs-on: windows-2022
-    env:
-      GYP_MSVS_VERSION: '2022'
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -146,6 +169,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+
+      - name: Configure node-gyp v12 for Visual Studio 2026 (v18)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ngDir = Join-Path $env:RUNNER_TEMP "node-gyp12"
+          npm install --prefix $ngDir node-gyp@12
+          $ngPkgDir = (Join-Path $ngDir "node_modules\node-gyp").Replace("\", "/")
+          $hookPath = (Join-Path $env:RUNNER_TEMP "use-node-gyp12.cjs")
+          $hookContent = @"
+          const Module = require('module');
+          const origResolve = Module._resolveFilename;
+          const ngDir = '$ngPkgDir';
+          Module._resolveFilename = function (request, parent, isMain, options) {
+            if (request === 'node-gyp') return origResolve.call(this, ngDir, parent, isMain, options);
+            if (request.startsWith('node-gyp/')) return origResolve.call(this, ngDir + '/' + request.slice(9), parent, isMain, options);
+            return origResolve.call(this, request, parent, isMain, options);
+          };
+          "@
+          Set-Content -Path $hookPath -Value $hookContent -Encoding UTF8
+          $hookPosix = $hookPath.Replace("\", "/")
+          Add-Content -Path $env:GITHUB_ENV -Value "NODE_OPTIONS=--require $hookPosix"
+          Add-Content -Path $env:GITHUB_ENV -Value "npm_config_node_gyp=$ngPkgDir/bin/node-gyp.js"
+          $env:NODE_OPTIONS = "--require $hookPosix"
+          node -e "console.log('node-gyp override version:', require('node-gyp/package.json').version)"
 
       - name: Enable Corepack
         run: corepack enable
