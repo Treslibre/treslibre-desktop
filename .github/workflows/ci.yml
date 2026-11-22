@@ -58,31 +58,6 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
-      - name: Configure node-gyp v12 for Visual Studio 2026 (v18)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $ngDir = Join-Path $env:RUNNER_TEMP "node-gyp12"
-          npm install --prefix $ngDir node-gyp@12
-          $ngPkgDir = (Join-Path $ngDir "node_modules\node-gyp").Replace("\", "/")
-          $hookPath = (Join-Path $env:RUNNER_TEMP "use-node-gyp12.cjs")
-          $hookContent = @"
-          const Module = require('module');
-          const origResolve = Module._resolveFilename;
-          const ngDir = '$ngPkgDir';
-          Module._resolveFilename = function (request, parent, isMain, options) {
-            if (request === 'node-gyp') return origResolve.call(this, ngDir, parent, isMain, options);
-            if (request.startsWith('node-gyp/')) return origResolve.call(this, ngDir + '/' + request.slice(9), parent, isMain, options);
-            return origResolve.call(this, request, parent, isMain, options);
-          };
-          "@
-          Set-Content -Path $hookPath -Value $hookContent -Encoding UTF8
-          $hookPosix = $hookPath.Replace("\", "/")
-          Add-Content -Path $env:GITHUB_ENV -Value "NODE_OPTIONS=--require $hookPosix"
-          Add-Content -Path $env:GITHUB_ENV -Value "npm_config_node_gyp=$ngPkgDir/bin/node-gyp.js"
-          $env:NODE_OPTIONS = "--require $hookPosix"
-          node -e "console.log('node-gyp override version:', require('node-gyp/package.json').version)"
-
       - name: Enable Corepack
         run: corepack enable
 
@@ -171,29 +146,30 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Configure node-gyp v12 for Visual Studio 2026 (v18)
-        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $ngDir = Join-Path $env:RUNNER_TEMP "node-gyp12"
           npm install --prefix $ngDir node-gyp@12
           $ngPkgDir = (Join-Path $ngDir "node_modules\node-gyp").Replace("\", "/")
-          $hookPath = (Join-Path $env:RUNNER_TEMP "use-node-gyp12.cjs")
-          $hookContent = @"
-          const Module = require('module');
-          const origResolve = Module._resolveFilename;
-          const ngDir = '$ngPkgDir';
-          Module._resolveFilename = function (request, parent, isMain, options) {
-            if (request === 'node-gyp') return origResolve.call(this, ngDir, parent, isMain, options);
-            if (request.startsWith('node-gyp/')) return origResolve.call(this, ngDir + '/' + request.slice(9), parent, isMain, options);
-            return origResolve.call(this, request, parent, isMain, options);
-          };
+          $ngBin = "$ngPkgDir/bin/node-gyp.js"
+          $npxCmd = (Get-Command npx.cmd).Source
+          $npxDir = Split-Path $npxCmd -Parent
+          $npxReal = Join-Path $npxDir "npx-real.cmd"
+          if (-not (Test-Path $npxReal)) {
+            Move-Item -Path $npxCmd -Destination $npxReal
+          }
+          $wrapper = @"
+          @echo off
+          if "%~1"=="node-gyp-build" (
+            node "$ngBin" rebuild
+            exit /b %ERRORLEVEL%
+          )
+          call "%~dp0npx-real.cmd" %*
           "@
-          Set-Content -Path $hookPath -Value $hookContent -Encoding UTF8
-          $hookPosix = $hookPath.Replace("\", "/")
-          Add-Content -Path $env:GITHUB_ENV -Value "NODE_OPTIONS=--require $hookPosix"
-          Add-Content -Path $env:GITHUB_ENV -Value "npm_config_node_gyp=$ngPkgDir/bin/node-gyp.js"
-          $env:NODE_OPTIONS = "--require $hookPosix"
-          node -e "console.log('node-gyp override version:', require('node-gyp/package.json').version)"
+          Set-Content -Path $npxCmd -Value $wrapper -Encoding ASCII
+          Add-Content -Path $env:GITHUB_ENV -Value "npm_config_node_gyp=$ngBin"
+          node $ngBin --version
+          npx --version
 
       - name: Enable Corepack
         run: corepack enable
