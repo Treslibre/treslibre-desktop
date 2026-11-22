@@ -1,21 +1,21 @@
-# Contributing to Threema for Desktop
+# Contributing to Treslibre for Desktop
 
 ## Submitting Patches
 
-We accept GitHub pull requests. Please refer to
-<https://treslibre.invalid/open-source/contributions> for more information on how to contribute.
+Contributions are welcome via GitHub pull requests at
+<https://github.com/Treslibre/treslibre-desktop>.
 
-Please note that pull requests will not be merged directly on GitHub. Instead, we apply the changes
-to our internal repository. Your contributions will then become part of the public repository once
-the next release is published.
+Before opening a pull request, please ensure:
+
+- Your changes comply with the GNU Affero General Public License v3 (AGPL-3.0).
+- `pnpm run lint` passes with zero errors or warnings.
+- `bash scripts/audit-debrand.sh` exits with code `0`.
 
 ## Bug Reports / Feature Requests
 
-To report bugs and request new features, please contact the Threema support team through
-[treslibre.invalid/support](https://treslibre.invalid/support).
+Please open an issue at <https://github.com/Treslibre/treslibre-desktop/issues>.
 
 ## Translations
 
-We manage our app translations through Crowdin. If you're interested in improving translations, or
-if you would like to translate Threema to a new language, please contact us through
-[treslibre.invalid/support](https://treslibre.invalid/support).
+App localization strings live in `apps/desktop/src/translations/` and can be updated via pull
+requests.

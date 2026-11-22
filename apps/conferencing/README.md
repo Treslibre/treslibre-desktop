@@ -1,6 +1,6 @@
-# Threema Conferencing
+# Treslibre Conferencing
 
-The Threema Conferencing web app, built with Svelte and Tailwind CSS. It is a static single-page
+The Treslibre Conferencing web app, built with Svelte and Tailwind CSS. It is a static single-page
 app, which is distributed as a container image that serves the pre-built files.
 
 ## Deployment

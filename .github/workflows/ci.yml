@@ -1,0 +1,158 @@
+name: Desktop CI
+
+on:
+  push:
+    branches: [stable, main]
+  pull_request:
+    branches: [stable, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  debrand-audit:
+    name: Debrand Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run debranding audit
+        run: bash scripts/audit-debrand.sh
+
+  rust-launcher:
+    name: Rust Launcher Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.94'
+          components: clippy
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src/rust/launcher
+
+      - name: Run clippy on launcher
+        env:
+          RUSTFLAGS: '-D warnings'
+          THREEMA_BUILD_FLAVOR: work-onprem
+        run: cargo clippy --manifest-path apps/desktop/src/rust/launcher/Cargo.toml
+
+  lint-build-test:
+    name: Lint, Build & Mocha Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install protobuf compiler
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends protobuf-compiler
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.94'
+          targets: wasm32-unknown-unknown
+
+      - name: Cache libthreema Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/libthreema-wasm/libs/libthreema
+
+      - name: Install wasm-bindgen-cli and binaryen
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@0.2.114,binaryen
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm run build:packages
+
+      - name: Run lint
+        run: pnpm run lint
+
+      - name: Build conferencing
+        run: pnpm run build:conferencing
+
+      - name: Build desktop (work-onprem)
+        run: pnpm run build:desktop:work-onprem
+
+      - name: Run Mocha tests (work-onprem)
+        run: pnpm run test:desktop:mocha:work-onprem
+
+  dist-windows:
+    name: Windows Dist (work-onprem)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: [debrand-audit, lint-build-test]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.94'
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-bindgen-cli, binaryen, and protoc
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@0.2.114,binaryen,protoc
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and package Windows dist
+        shell: pwsh
+        env:
+          TURBO_BUILD_ENVIRONMENT: onprem
+          TURBO_BUILD_VARIANT: work
+        run: |
+          pnpm --filter threema-desktop run build
+          pnpm --filter threema-desktop run dist
+
+      - name: Upload Windows packaged artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: treslibre-desktop-win32-x64
+          path: build/apps/desktop/packaged/Treslibre-win32-x64

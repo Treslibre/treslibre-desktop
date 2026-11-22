@@ -30,9 +30,9 @@ echo "OK: Zero prohibited upstream domains or legal entity strings found."
 echo "=== [2/2] Auditing user-facing localization, manifest, and desktop files for lingering Threema product strings ==="
 # Exclude AGPL attribution strings ("fork of Threema", "Threema AG", "Threema GmbH") and internal icon font filename references
 UI_FILES=(
-    "apps/desktop/public/locales/en/translation.json"
-    "apps/desktop/public/locales/de/translation.json"
-    "apps/desktop/public/treslibre.webmanifest"
+    "apps/desktop/src/translations/en/translation.json"
+    "apps/desktop/src/translations/de/translation.json"
+    "apps/desktop/src/public/treslibre.webmanifest"
     "apps/desktop/packaging/metadata/org.treslibre.app.desktop.desktop"
     "apps/desktop/packaging/metadata/org.treslibre.app.desktop.metainfo.xml"
     "apps/desktop/packaging/msix/AppxManifest.xml"
